@@ -1,0 +1,21 @@
+---
+title: "SEB108 Practicals"
+subtitle: "Foundations of Data Analysis and Visualisation"
+engine: markdown
+---
+
+These pages are where you learn the Python you'll use in SEB108. The code runs right here in your browser, so there's nothing to install, nothing to save and nothing to submit.
+
+Your **assessment workbook** is separate. It's a Colab notebook you open from Canvas, and it's the only thing you hand in.
+
+| Week | Practical |
+|---|---|
+| 8 | [P1: Python basics](p1.qmd) |
+| 9 | P2: Cleaning data |
+| 10 | P3: Descriptive statistics and the t-test |
+| 11 | P4: Visualisation |
+
+::: {.callout-tip}
+## Before you start
+You need an internet connection. The first time you open a practical, Python takes a few seconds to load. After that it's quicker.
+:::

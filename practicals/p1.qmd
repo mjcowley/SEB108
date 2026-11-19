@@ -1,0 +1,490 @@
+---
+title: "P1: Python basics"
+subtitle: "Week 8. Python runs in your browser: nothing to install, save or submit."
+engine: markdown
+pyodide:
+  packages:
+    - pandas
+  resources:
+    - data/p1_practice.csv
+---
+
+::: {.callout-note}
+The first time you open this page, Python takes a few seconds to load. Wait until the code cells show a **Run Code** button.
+:::
+
+This is a practical page, not your assessment. You don't hand anything in from here. At the end of today's session you'll open your **assessment workbook** in Colab and start on it.
+
+## 1. Running code on this page
+
+Each grey box below is a **code cell**. Click **Run Code** and the output appears underneath.
+
+```{pyodide}
+print("Hello from Python")
+```
+
+You can change any cell and run it again. Try changing the message above to your name.
+
+Cells on this page share what they've made, so a cell can use a variable made in an earlier cell. **Run the cells in order, from the top.** If you reload the page, Python forgets everything and you start again from the top.
+
+## 2. Numbers, maths and variables
+
+Python works like a calculator.
+
+```{pyodide}
+2 + 3
+```
+
+To keep a result, store it in a **variable** with `=`.
+
+```{pyodide}
+depth_m = 2.5
+width_m = 12
+area_m2 = depth_m * width_m
+print(area_m2)
+```
+
+Names can't have spaces, so use underscores. Good names say what's stored: `area_m2` is far better than `x`. Names are case-sensitive, so `Area` and `area` are different variables.
+
+Here are the maths operators you'll use. A `#` starts a **comment**: a note for humans that Python ignores.
+
+```{pyodide}
+print(7 + 2)   # add
+print(7 - 2)   # subtract
+print(7 * 2)   # multiply
+print(7 / 2)   # divide
+print(7 ** 2)  # to the power of
+```
+
+::: {.callout-warning}
+Use `**` for powers, never `^`. In Python `^` means something else, and it won't give you an error, just a wrong answer. Try `7 ^ 2` above and see.
+:::
+
+Python has two kinds of number. **Integers** (`int`) are whole numbers like `12`. **Floats** (`float`) have a decimal point, like `2.5`. Dividing with `/` always gives a float, even when the answer's a whole number. `type()` tells you what kind of value you've got.
+
+```{pyodide}
+print(type(12))
+print(type(2.5))
+print(6 / 3)
+```
+
+## 3. Text, and True or False
+
+Text goes in quotes. Python calls it a **string** (`str`).
+
+```{pyodide}
+site = "Lower Creek"
+print(site)
+print(type(site))
+```
+
+**Comparisons** give you `True` or `False`. These are called **booleans** (`bool`).
+
+```{pyodide}
+reading = 35.0
+
+print(reading > 20)    # greater than
+print(reading < 20)    # less than
+print(reading >= 35)   # greater than or equal to
+print(reading == 35)   # equal to (two equals signs)
+print(reading != 0)    # not equal to
+```
+
+Watch out for `==`. One equals sign **stores** a value. Two **checks** whether two things are equal.
+
+Comparisons are how you'll pick out the rows you want from a table of data in Section 8.
+
+## 4. Lists
+
+A **list** holds several values in order, inside square brackets.
+
+```{pyodide}
+readings = [12.4, 8.1, 35.0, 9.7, 15.2]
+print(readings)
+```
+
+Two functions you'll use with lists all the time are `len()`, which counts the items, and `sum()`, which adds them up.
+
+```{pyodide}
+print(len(readings))
+print(sum(readings))
+print(sum(readings) / len(readings))  # the mean
+```
+
+You get an item out of a list by its position, called its **index**. Python counts from **0**, so the first item is at index 0. Negative numbers count back from the end.
+
+```{pyodide}
+print(readings[0])   # first item
+print(readings[2])   # third item
+print(readings[-1])  # last item
+```
+
+To get several items at once, give a range of positions. This is called **slicing**. The first number is included and the second isn't.
+
+```{pyodide}
+print(readings[0:2])  # items at positions 0 and 1
+```
+
+## 5. Calling functions
+
+You've already used several **functions**: `print()`, `type()`, `len()` and `sum()`. A function is a named bit of code that does a job. You **call** it by writing its name with round brackets, and you put what it needs inside the brackets. The things inside are called **arguments**.
+
+```{pyodide}
+print(max(readings))
+print(min(readings))
+print(round(13.98765, 2))  # round to 2 decimal places
+```
+
+Some arguments have names, and you can write them as `name=value`. These are **keyword arguments**, and they make code easier to read. These two lines do the same thing:
+
+```{pyodide}
+print(round(13.98765, 2))
+print(round(13.98765, ndigits=2))
+```
+
+You'll see keyword arguments everywhere in data analysis, like `pd.read_csv("file.csv", dayfirst=True)` next week.
+
+A **method** is a function that belongs to a value. You call it with a dot after the value.
+
+```{pyodide}
+site = "lower creek"
+print(site.upper())
+print(site.title())
+```
+
+From Section 7 you'll use methods on tables of data, like `readings.head()`. It's the same idea: a value, a dot, then the method name and brackets.
+
+If you're not sure what a function does, `help()` will tell you.
+
+```{pyodide}
+help(round)
+```
+
+## 6. Errors
+
+Errors are normal. Everyone gets them, all the time. Run the cell below to see one.
+
+```{pyodide}
+print(rainfall)
+```
+
+**Read the last line of an error first.** It tells you the type of error and what went wrong. Here it's a `NameError`: Python doesn't know anything called `rainfall`, because we never made it.
+
+These are the errors you're most likely to see in this unit.
+
+| Error | What it usually means |
+|---|---|
+| `NameError` | You've used a variable that doesn't exist yet. Usually a cell was skipped or run out of order, or there's a typo in the name. |
+| `SyntaxError` | The code isn't written correctly: a missing bracket, colon or quote mark. |
+| `TypeError` | You've mixed types that don't go together, like adding a number to a string. |
+| `KeyError` | You've asked for a column name that doesn't exist. Check the spelling, spaces and capitals. |
+| `IndexError` | You've asked for a position past the end of a list. |
+| `ModuleNotFoundError` | You've tried to import a library that isn't installed, or misspelt its name. |
+| `FileNotFoundError` | Python can't find the file you asked for. Check the file name. |
+
+## 7. Loading a table of data with pandas
+
+Real data comes as a table: rows and columns, like a spreadsheet. **pandas** is the Python library for working with tables. A library is a bundle of extra tools, and you load it with `import`. By convention we give pandas the short name `pd`.
+
+```{pyodide}
+import pandas as pd
+```
+
+Data files often come as a **CSV** (comma-separated values), a plain text file with one row per line. `pd.read_csv()` loads one into a table, which pandas calls a **DataFrame**.
+
+The file we're using today is **made up for practice**, but it's laid out exactly like real water quality monitoring data. Each row is one measurement of one thing (for example total suspended solids) from one water sample.
+
+```{pyodide}
+samples = pd.read_csv("data/p1_practice.csv")
+samples.head()
+```
+
+`.head()` shows the first five rows. Try `samples.head(10)` to see ten.
+
+Before doing anything with a dataset, find out how big it is and what's in it.
+
+```{pyodide}
+print(samples.shape)    # (number of rows, number of columns)
+print(samples.columns)  # the column names
+```
+
+`.dtypes` tells you what kind of data is in each column. `int64` and `float64` are numbers. `object` or `str` means text.
+
+```{pyodide}
+samples.dtypes
+```
+
+Notice the `Date Time` column is text, not a date. You'll fix that in P2.
+
+## 8. Selecting and filtering
+
+To get one column, put its name in square brackets, in quotes. It has to match exactly, spaces and capitals included.
+
+```{pyodide}
+samples["Site Code"]
+```
+
+`.unique()` lists the different values in a column, and `.value_counts()` counts how many rows have each one.
+
+```{pyodide}
+print(samples["Site Code"].unique())
+print(samples["Analyte"].value_counts())
+```
+
+You can do maths on a column of numbers.
+
+```{pyodide}
+values = samples["Value (mg per L)"]
+print(values.mean())
+print(values.max())
+```
+
+To **filter** rows, put a comparison inside square brackets. You get back only the rows where the comparison is `True`.
+
+```{pyodide}
+high = samples[samples["Value (mg per L)"] > 50]
+high
+```
+
+To filter on two things at once, wrap each comparison in round brackets and join them with `&` (and).
+
+```{pyodide}
+tss = samples[(samples["Analyte"] == "Total suspended solids") & (samples["Site Code"] == "PRAC01")]
+print(len(tss), "rows")
+print(tss["Value (mg per L)"].mean())
+```
+
+## 9. Moving to Colab for your assessment
+
+Your assessment workbook isn't on this page. It's a **Google Colab** notebook. Colab runs Python too, but it works a bit differently, and you'll switch to it at the end of today's practical.
+
+- **What it is.** Colab is a free Google service that runs Python notebooks in your browser. You need a Google account.
+- **Opening your workbook.** Click the **Open in Colab** button on the Canvas assessment page.
+- **Save a copy straight away.** The notebook opens as a read-only copy. Go to **File > Save a copy in Drive** and work in the copy that opens (its name starts with "Copy of"). If you skip this, your work won't be saved.
+- **Where it lives.** Your copy is saved in your Google Drive, in a folder called Colab Notebooks. Open it from there next time, not from the Canvas button.
+- **Running cells.** Click the play button on the left of a cell, or press **Shift + Enter**. Like this page, Colab remembers what you've run in the order you ran it.
+- **Starting fresh.** **Runtime > Restart session and run all** wipes everything and runs every cell from the top. Your workbook has to pass this test, and it's what you'll do at each check-off.
+- **Text cells.** Colab also has text cells for writing. Double-click one to edit it, and press **Shift + Enter** when you're done.
+- **GenAI.** Colab may offer to write code for you. You can use GenAI on your workbook, but not during check-offs, where you'll run and explain your analysis yourself. Make sure you understand every line.
+
+## In-class activities
+
+Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look.
+
+Every exercise starts fresh, so the data is reloaded for you where it's needed.
+
+### Activity 1: Variables and maths
+
+You'll need section 2.
+
+A water sample has a total nitrogen concentration of 0.85 mg/L, and the river is carrying 1,200 megalitres (ML) of water a day. One ML is a million litres. Work out how many kilograms of nitrogen the river carries in a day.
+
+(1 kg is 1,000,000 mg, so mg/L × ML gives you kg straight away.)
+
+```{pyodide}
+#| exercise: ex_load_maths
+concentration_mg_per_L = 0.85
+flow_ML_per_day = 1200
+
+load_kg_per_day = ______
+print(load_kg_per_day)
+```
+
+::: {.hint exercise="ex_load_maths"}
+Multiply the two variables together.
+:::
+
+::: {.hint exercise="ex_load_maths"}
+`load_kg_per_day = concentration_mg_per_L * flow_ML_per_day`
+:::
+
+::: {.solution exercise="ex_load_maths"}
+```python
+concentration_mg_per_L = 0.85
+flow_ML_per_day = 1200
+
+load_kg_per_day = concentration_mg_per_L * flow_ML_per_day
+print(load_kg_per_day)
+```
+:::
+
+### Activity 2: Exam scores
+
+You'll need sections 4 and 5.
+
+Here are the mid-semester exam scores (out of 120) for a class. Work out how many students sat the exam, the mean score, and the highest and lowest scores. Round the mean to one decimal place.
+
+```{pyodide}
+#| exercise: ex_scores
+scores = [100, 68, 40, 78, 81, 65, 39, 118, 46, 78, 9, 37, 43, 87, 54, 29, 95, 87, 111, 65,
+          43, 53, 47, 16, 98, 82, 58, 5, 49, 67, 60, 76, 16, 111, 65, 61, 73, 63, 115, 72]
+
+n_students = ______
+mean_score = ______
+print(n_students, "students")
+print("Mean:", round(mean_score, 1))
+print("Highest:", ______)
+print("Lowest:", ______)
+```
+
+::: {.hint exercise="ex_scores"}
+`len()` counts the items in a list. The mean is the total divided by the count. `max()` and `min()` find the biggest and smallest.
+:::
+
+::: {.hint exercise="ex_scores"}
+`n_students = len(scores)` and `mean_score = sum(scores) / len(scores)`.
+:::
+
+::: {.solution exercise="ex_scores"}
+```python
+scores = [100, 68, 40, 78, 81, 65, 39, 118, 46, 78, 9, 37, 43, 87, 54, 29, 95, 87, 111, 65,
+          43, 53, 47, 16, 98, 82, 58, 5, 49, 67, 60, 76, 16, 111, 65, 61, 73, 63, 115, 72]
+
+n_students = len(scores)
+mean_score = sum(scores) / len(scores)
+print(n_students, "students")
+print("Mean:", round(mean_score, 1))
+print("Highest:", max(scores))
+print("Lowest:", min(scores))
+```
+:::
+
+### Activity 3: Load and look
+
+You'll need section 7.
+
+Load the practice data and find out how many rows and columns it has, what the columns are called, and which columns hold numbers.
+
+```{pyodide}
+#| exercise: ex_look
+import pandas as pd
+
+samples = ______("data/p1_practice.csv")
+
+print(samples.______)
+print(samples.______)
+print(samples.______)
+```
+
+::: {.hint exercise="ex_look"}
+The function that loads a CSV is in pandas, so it starts with `pd.`. Then you need `shape`, `columns` and `dtypes`.
+:::
+
+::: {.hint exercise="ex_look"}
+`samples = pd.read_csv("data/p1_practice.csv")`. Note that `shape`, `columns` and `dtypes` don't need round brackets after them.
+:::
+
+::: {.solution exercise="ex_look"}
+```python
+import pandas as pd
+
+samples = pd.read_csv("data/p1_practice.csv")
+
+print(samples.shape)
+print(samples.columns)
+print(samples.dtypes)
+```
+:::
+
+### Activity 4: What's in the data?
+
+You'll need section 8.
+
+Find out which sites are in the data, which things were measured, and how many rows there are for each site.
+
+```{pyodide}
+#| exercise: ex_whats_in
+#| setup: true
+import pandas as pd
+samples = pd.read_csv("data/p1_practice.csv")
+```
+
+```{pyodide}
+#| exercise: ex_whats_in
+print(samples["Site Code"].______())
+print(samples["Analyte"].______())
+print(samples["Site Code"].______())
+```
+
+::: {.hint exercise="ex_whats_in"}
+One method lists the different values in a column. Another counts how many rows have each value.
+:::
+
+::: {.hint exercise="ex_whats_in"}
+Use `.unique()` for the first two and `.value_counts()` for the third.
+:::
+
+::: {.solution exercise="ex_whats_in"}
+```python
+print(samples["Site Code"].unique())
+print(samples["Analyte"].unique())
+print(samples["Site Code"].value_counts())
+```
+:::
+
+### Activity 5: Compare two sites
+
+You'll need section 8.
+
+Pick out the **total suspended solids** rows for each site, then print how many rows each site has and its mean value.
+
+```{pyodide}
+#| exercise: ex_compare
+#| setup: true
+import pandas as pd
+samples = pd.read_csv("data/p1_practice.csv")
+```
+
+```{pyodide}
+#| exercise: ex_compare
+tss = samples[samples["Analyte"] == ______]
+
+site_1 = tss[tss["Site Code"] == "PRAC01"]
+site_2 = tss[tss["Site Code"] == ______]
+
+print("PRAC01:", len(site_1), "rows, mean", site_1["Value (mg per L)"].______())
+print("PRAC02:", len(site_2), "rows, mean", site_2["Value (mg per L)"].______())
+```
+
+::: {.hint exercise="ex_compare"}
+The analyte and site names are text, so they need quotes. They have to match the data exactly: check your answer to Activity 4.
+:::
+
+::: {.hint exercise="ex_compare"}
+Use `"Total suspended solids"` and `"PRAC02"`, then `.mean()` on each column.
+:::
+
+::: {.solution exercise="ex_compare"}
+```python
+tss = samples[samples["Analyte"] == "Total suspended solids"]
+
+site_1 = tss[tss["Site Code"] == "PRAC01"]
+site_2 = tss[tss["Site Code"] == "PRAC02"]
+
+print("PRAC01:", len(site_1), "rows, mean", site_1["Value (mg per L)"].mean())
+print("PRAC02:", len(site_2), "rows, mean", site_2["Value (mg per L)"].mean())
+```
+:::
+
+### Activity 6: From numbers to a question
+
+You'll need your answer to Activity 5. No code this time: write your answers on paper or in a notes file.
+
+1. Write a hypothesis you could test with the practice data, in this form: *[what was measured]* differs between *[site A]* and *[site B]*.
+2. Write the **null hypothesis**: the "nothing's going on" version.
+3. The means in Activity 5 are different. Give one reason why that might **not** mean the sites are really different. (Think about how many samples there are, and whether a few big values could be pulling a mean up.)
+4. Which of these questions could the practice data answer, and which couldn't it? Say why.
+    - Is total nitrogen higher at PRAC02 than at PRAC01?
+    - Is total suspended solids related to total nitrogen?
+    - Has total nitrogen gone up over the last ten years?
+
+## Bridge to your assessment
+
+Your assessment data is laid out like the practice data, with the same columns. Now you'll do the same first steps on it.
+
+1. Open your **assessment workbook** from the **Open in Colab** button on Canvas.
+2. **File > Save a copy in Drive**, and work in your copy from now on.
+3. Run the loader cell, then the sanity-check cell. Check the number of rows and the first few rows look sensible.
+4. Read the assessment brief, then choose one of its hypothesis templates. Write your hypothesis and null hypothesis in the workbook's Problem Statement section.
+
+That's check-off 1. When you're ready, put your hand up and your demonstrator will come and see it.

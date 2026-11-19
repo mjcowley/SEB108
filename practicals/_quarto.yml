@@ -1,0 +1,22 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "SEB108 Practicals"
+  sidebar:
+    style: docked
+    search: true
+    contents:
+      - text: "Home"
+        href: index.qmd
+      - text: "P1: Python basics"
+        href: p1.qmd
+      # Add P2 to P4 here as they're written:
+      # - text: "P2: Cleaning data"
+      #   href: p2.qmd
+
+format:
+  live-html:
+    toc: true
+    toc-depth: 2
