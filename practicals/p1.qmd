@@ -2,6 +2,8 @@
 title: "P1: Python basics"
 subtitle: "Week 8. Python runs in your browser: nothing to install, save or submit."
 engine: markdown
+resources:
+  - data/p1_practice.csv
 pyodide:
   packages:
     - pandas
@@ -246,13 +248,18 @@ high = samples[samples["Value (mg per L)"] > 50]
 high
 ```
 
-To filter on two things at once, wrap each comparison in round brackets and join them with `&` (and).
+To filter on two things at once, join the comparisons with `&` (and). Storing each comparison in a variable first keeps it readable.
 
 ```{pyodide}
-tss = samples[(samples["Analyte"] == "Total suspended solids") & (samples["Site Code"] == "PRAC01")]
+is_tss = samples["Analyte"] == "Total suspended solids"
+is_prac01 = samples["Site Code"] == "PRAC01"
+
+tss = samples[is_tss & is_prac01]
 print(len(tss), "rows")
 print(tss["Value (mg per L)"].mean())
 ```
+
+If you write the comparisons straight inside the square brackets instead, wrap each one in round brackets: `samples[(samples["Analyte"] == "Total suspended solids") & (samples["Site Code"] == "PRAC01")]`.
 
 ## 9. Moving to Colab for your assessment
 
@@ -316,8 +323,10 @@ Here are the mid-semester exam scores (out of 120) for a class. Work out how man
 
 ```{pyodide}
 #| exercise: ex_scores
-scores = [100, 68, 40, 78, 81, 65, 39, 118, 46, 78, 9, 37, 43, 87, 54, 29, 95, 87, 111, 65,
-          43, 53, 47, 16, 98, 82, 58, 5, 49, 67, 60, 76, 16, 111, 65, 61, 73, 63, 115, 72]
+scores = [100, 68, 40, 78, 81, 65, 39, 118, 46, 78,
+          9, 37, 43, 87, 54, 29, 95, 87, 111, 65,
+          43, 53, 47, 16, 98, 82, 58, 5, 49, 67,
+          60, 76, 16, 111, 65, 61, 73, 63, 115, 72]
 
 n_students = ______
 mean_score = ______
@@ -337,8 +346,10 @@ print("Lowest:", ______)
 
 ::: {.solution exercise="ex_scores"}
 ```python
-scores = [100, 68, 40, 78, 81, 65, 39, 118, 46, 78, 9, 37, 43, 87, 54, 29, 95, 87, 111, 65,
-          43, 53, 47, 16, 98, 82, 58, 5, 49, 67, 60, 76, 16, 111, 65, 61, 73, 63, 115, 72]
+scores = [100, 68, 40, 78, 81, 65, 39, 118, 46, 78,
+          9, 37, 43, 87, 54, 29, 95, 87, 111, 65,
+          43, 53, 47, 16, 98, 82, 58, 5, 49, 67,
+          60, 76, 16, 111, 65, 61, 73, 63, 115, 72]
 
 n_students = len(scores)
 mean_score = sum(scores) / len(scores)
@@ -442,8 +453,10 @@ tss = samples[samples["Analyte"] == ______]
 site_1 = tss[tss["Site Code"] == "PRAC01"]
 site_2 = tss[tss["Site Code"] == ______]
 
-print("PRAC01:", len(site_1), "rows, mean", site_1["Value (mg per L)"].______())
-print("PRAC02:", len(site_2), "rows, mean", site_2["Value (mg per L)"].______())
+print("PRAC01:", len(site_1), "rows")
+print("PRAC01 mean:", site_1["Value (mg per L)"].______())
+print("PRAC02:", len(site_2), "rows")
+print("PRAC02 mean:", site_2["Value (mg per L)"].______())
 ```
 
 ::: {.hint exercise="ex_compare"}
@@ -461,8 +474,10 @@ tss = samples[samples["Analyte"] == "Total suspended solids"]
 site_1 = tss[tss["Site Code"] == "PRAC01"]
 site_2 = tss[tss["Site Code"] == "PRAC02"]
 
-print("PRAC01:", len(site_1), "rows, mean", site_1["Value (mg per L)"].mean())
-print("PRAC02:", len(site_2), "rows, mean", site_2["Value (mg per L)"].mean())
+print("PRAC01:", len(site_1), "rows")
+print("PRAC01 mean:", site_1["Value (mg per L)"].mean())
+print("PRAC02:", len(site_2), "rows")
+print("PRAC02 mean:", site_2["Value (mg per L)"].mean())
 ```
 :::
 
