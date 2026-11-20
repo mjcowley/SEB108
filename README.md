@@ -1,3 +1,5 @@
+![SEB108 Data Analysis and Visualisation banner, with charts and maps on a blue background](practicals/images/seb108-banner.png)
+
 # SEB108 Foundations of Data Analysis and Visualisation
 
 Teaching materials for SEB108 at QUT (School of Chemistry and Physics). Students learn Python for data analysis, then analyse real river water quality data for our industry partner, the Queensland Government's Water Quality & Investigations team (WQI).
