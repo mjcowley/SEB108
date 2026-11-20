@@ -135,6 +135,11 @@ Most samples are fairly low, but a few are enormous. These come from floods, whe
 
 A handful of huge values pull the mean up a long way, but they barely move the median, because the median only cares about the middle. That's why the mean and median disagree, and why the median is often the better summary for data like this.
 
+![](images/p3-mean-median-light.png){.light-content fig-alt="Histogram of wet season TSS at Yarrahappini. Most samples are below 1,000 mg/L, with a long tail of a few samples out to about 9,000 mg/L. A solid line marks the median at 223 mg/L, and a dashed line marks the mean at 476 mg/L, well to the right of the median."}
+![](images/p3-mean-median-dark.png){.dark-content fig-alt="Histogram of wet season TSS at Yarrahappini. Most samples are below 1,000 mg/L, with a long tail of a few samples out to about 9,000 mg/L. A solid line marks the median at 223 mg/L, and a dashed line marks the mean at 476 mg/L, well to the right of the median."}
+
+Here's the same histogram with the median (solid line) and mean (dashed line) marked. The few huge flood samples drag the mean well to the right of the median.
+
 Try the same histogram for `dry`.
 
 ## 4. The two-sample t-test
@@ -164,6 +169,20 @@ A test only gives a trustworthy answer if its assumptions are met. The t-test as
 1. The values in each group are roughly **normally distributed**, a symmetrical bell shape. Section 3 showed ours are strongly skewed.
 2. The two groups have a similar **spread**. Ours have large standard deviations driven by a few floods.
 3. Each sample is **independent** of the others. WQI often take several samples on the same day during a flood, and samples a few hours apart aren't independent.
+
+Here's what the first assumption looks like, next to our data.
+
+![](images/p3-normal-skewed-light.png){.light-content fig-alt="Two histograms side by side. The left one, made-up data, is a symmetrical bell shape centred on 50. The right one, real wet season TSS, has a tall peak near zero and a long tail stretching to the right."}
+![](images/p3-normal-skewed-dark.png){.dark-content fig-alt="Two histograms side by side. The left one, made-up data, is a symmetrical bell shape centred on 50. The right one, real wet season TSS, has a tall peak near zero and a long tail stretching to the right."}
+
+A normal distribution is symmetrical, with most values near the middle. Ours is nothing like it.
+
+And here's the third. Each dot below is one sample.
+
+![](images/p3-flood-sampling-light.png){.light-content fig-alt="Every TSS sample at Yarrahappini from mid January to mid April 2022, plotted against date. The dots come in tight clusters around each flood, several a day at times, with gaps of one to three weeks between clusters. The highest values, up to about 5,400 mg/L, are in the late March cluster."}
+![](images/p3-flood-sampling-dark.png){.dark-content fig-alt="Every TSS sample at Yarrahappini from mid January to mid April 2022, plotted against date. The dots come in tight clusters around each flood, several a day at times, with gaps of one to three weeks between clusters. The highest values, up to about 5,400 mg/L, are in the late March cluster."}
+
+Samples come in bursts during each flood, sometimes several a day, then hardly any in between. Samples taken a few hours apart in the same flood are very alike, so they aren't independent. This is also why there are so many more wet season samples.
 
 With hundreds of samples the t-test copes with some skew, but a few extreme values still swamp the means. So for this data, the t-test result is shaky. Your job in the workbook is to name at least one assumption that's shaky for your data and explain why.
 
