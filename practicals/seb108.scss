@@ -4,6 +4,19 @@
 
 /*-- scss:rules --*/
 
+// Give the light/dark switch a visible label. The text sits inside the
+// button, so clicking the words works too.
+.quarto-color-scheme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.quarto-color-scheme-toggle::after {
+  content: "Dark mode";
+  font-size: 0.85rem;
+}
+
 // Put code output in its own shaded box, so it doesn't blend into the text.
 .cell-output-container-pyodide:not(:empty) {
   background: rgba($body-color, 0.05);
