@@ -534,7 +534,7 @@ The first step uses a short `for` loop to tidy four columns in one go. It does e
 When you're ready, put your hand up and show your demonstrator your workbook with these done.
 
 - Your Section 2 cleaning code runs for your site and pollutant.
-- You can say why you kept the quality codes you did, and what you did with "<" and blank values.
+- You can say why you kept the quality codes you did, what you did with "<" and blank values, and whether you found any values in the wrong unit.
 - You've recorded how many rows each step removed.
 - You know how many wet and dry season samples you have.
 
