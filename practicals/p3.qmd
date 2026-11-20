@@ -32,6 +32,8 @@ This cell repeats the P2 cleaning for TSS, so you start with `clean`, `wet` and 
 #| max-lines: 8
 #| caption: Cleaning from P2
 import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
 
 conc = pd.read_csv("data/yarrahappini_concentration.csv")
 my_site = "145014A"
