@@ -23,6 +23,15 @@ You'll do it in three steps. First you **describe** each season with a few numbe
 
 On this page we'll use **total suspended solids** (TSS) at the Logan River at Yarrahappini. TSS is the amount of sediment in the water.
 
+::: {.callout-tip}
+## By the end of this page you'll be able to
+
+- describe each season with the mean, median and standard deviation
+- explain why the mean and median disagree for skewed data
+- run a t-test and say what the p-value means in words
+- check your result with a second test
+:::
+
 ## 1. Start from clean data
 
 This cell repeats the P2 cleaning for TSS, so you start with `clean`, `wet` and `dry`. It runs by itself when the page loads, and you've seen every line before. Scroll inside it if you want to look.
@@ -160,7 +169,12 @@ print("t =", round(result.statistic, 2))
 print("p =", round(result.pvalue, 3))
 ```
 
-The **p-value** answers one question. If there were really no difference between the seasons, how often would you see a gap this big just by chance? Here p is about 0.075, so a gap this big would turn up about 7.5% of the time by chance alone.
+The **p-value** answers one question. If there were really no difference between the seasons, how often would you see a gap at least this big just by chance? Here p is about 0.075, so a gap at least this big would turn up about 7.5% of the time by chance alone.
+
+Here's that idea as a picture. If the season labels meant nothing, you could shuffle them at random, and any gap between the means would just be chance. The histogram shows the gaps from 5,000 shuffles. The dashed lines mark the real gap of 98 mg/L, in either direction. About 7.5% of the shuffles were at least that far from zero, which matches the t-test's p-value.
+
+![](images/p3-pvalue-shuffle-light.png){.light-content fig-alt="Histogram of 5,000 differences in mean TSS, wet minus dry, made by shuffling the season labels at random. They form a hump centred on zero, mostly between minus 150 and plus 150 mg/L. Dashed lines mark the real difference of 98 mg/L and minus 98 mg/L. A note says 7.5% of shuffles were at least this far from zero."}
+![](images/p3-pvalue-shuffle-dark.png){.dark-content fig-alt="Histogram of 5,000 differences in mean TSS, wet minus dry, made by shuffling the season labels at random. They form a hump centred on zero, mostly between minus 150 and plus 150 mg/L. Dashed lines mark the real difference of 98 mg/L and minus 98 mg/L. A note says 7.5% of shuffles were at least this far from zero."}
 
 The usual cut-off is 0.05. A p-value below 0.05 counts as a **significant** difference. This one is above 0.05, so the t-test says there isn't enough evidence that the mean TSS differs between the seasons.
 
@@ -192,19 +206,7 @@ With hundreds of samples the t-test copes with some skew, but a few extreme valu
 
 ## 6. Check your result
 
-When an assumption is shaky, check whether your conclusion survives a test that doesn't rely on it. In your workbook you'll do at least one of these checks. Here are all four.
-
-### Welch's t-test
-
-Welch's version of the t-test doesn't assume the two seasons have the same spread. Adding `equal_var=False` turns it on.
-
-```{pyodide}
-welch = stats.ttest_ind(wet["Value"], dry["Value"],
-                        equal_var=False)
-print("p =", round(welch.pvalue, 3))
-```
-
-Still above 0.05. Welch fixes the spread problem, but it still compares means, so the floods still dominate.
+When an assumption is shaky, check whether your conclusion survives a test that doesn't rely on it. In your workbook you'll explain at least one check. The two below are the most useful for this data. There are two more in the optional box after them.
 
 ### Mann-Whitney U test
 
@@ -216,17 +218,6 @@ print("p =", mw.pvalue)
 ```
 
 The p-value is tiny. A number like `2.3e-08` means 2.3 times ten to the power of minus 8, or 0.000000023, far below 0.05. Wet season samples really do tend to be higher. The check has **changed the conclusion**. The t-test couldn't see the difference because a few floods made the means too noisy.
-
-### Without 2021-22
-
-The 2021-22 year includes the February 2022 flood. Rerunning the test without it shows whether one extreme year is driving the result. The `!=` comparison means "not equal to".
-
-```{pyodide}
-no_flood = clean[clean["Sampling Year"] != "2021-2022"]
-w = no_flood[no_flood["Season"] == "Wet"]["Value"]
-d = no_flood[no_flood["Season"] == "Dry"]["Value"]
-print("p =", round(stats.ttest_ind(w, d).pvalue, 3))
-```
 
 ### One value per sampling day
 
@@ -245,11 +236,47 @@ print("p =", round(stats.ttest_ind(w, d).pvalue, 3))
 
 Notice how many fewer values there are. The 822 wet season samples came from only 364 different days.
 
+::: {.callout-tip collapse="true"}
+## Optional. Two more checks
+
+#### Welch's t-test
+
+Welch's version of the t-test doesn't assume the two seasons have the same spread. Adding `equal_var=False` turns it on.
+
+```{pyodide}
+welch = stats.ttest_ind(wet["Value"], dry["Value"],
+                        equal_var=False)
+print("p =", round(welch.pvalue, 3))
+```
+
+Still above 0.05. Welch fixes the spread problem, but it still compares means, so the floods still dominate.
+
+#### Without 2021-22
+
+The 2021-22 year includes the February 2022 flood. Rerunning the test without it shows whether one extreme year is driving the result. The `!=` comparison means "not equal to".
+
+```{pyodide}
+no_flood = clean[clean["Sampling Year"] != "2021-2022"]
+w = no_flood[no_flood["Season"] == "Wet"]["Value"]
+d = no_flood[no_flood["Season"] == "Dry"]["Value"]
+print("p =", round(stats.ttest_ind(w, d).pvalue, 3))
+```
+:::
+
 ## 7. Saying what you found
 
-A good result statement says what you compared, what you found, and how sure you are. Write p-values to two or three decimal places, or as "p < 0.001" when they're tiny. For TSS at Yarrahappini, it might look like this.
+A good result statement says what you compared, what you found, and how sure you are. Write p-values to two or three decimal places, or as "p < 0.001" when they're tiny. And always give the size of the difference too, like the two medians. A small p-value tells you a difference is probably real, not that it's big enough to matter. For TSS at Yarrahappini, it might look like this.
 
 > The median TSS was 223 mg/L in the wet season and 128 mg/L in the dry season. A two-sample t-test found no significant difference in means (p = 0.075). However, the data are strongly right-skewed, and a Mann-Whitney U test found a significant difference (p < 0.001). Wet season TSS tends to be higher, but a few very large flood samples make the means too variable for the t-test to detect it.
+
+::: {.callout-caution}
+## Common mistakes
+
+- Writing "p = 0.0". Write tiny p-values as p < 0.001
+- Reading "not significant" as "no difference". It means there isn't enough evidence of one
+- Only giving the p-value. Give the size of the difference too, like the two medians
+- Relying on the mean for skewed data without looking at the median
+:::
 
 ## In-class activities
 
@@ -736,3 +763,11 @@ When you're ready, put your hand up and show your demonstrator your workbook wit
 
 You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
 :::
+
+## Help and resources
+
+These are optional, for when you want more practice or a different explanation.
+
+- [Seeing Theory](https://seeing-theory.brown.edu/). Interactive visuals for probability, p-values and confidence intervals
+- [The t-test in SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_ind.html). The reference for `ttest_ind`, including Welch's version
+- [The Mann-Whitney U test in SciPy](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.mannwhitneyu.html). The reference for `mannwhitneyu`

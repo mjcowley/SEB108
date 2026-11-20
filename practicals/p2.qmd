@@ -21,6 +21,15 @@ There's rarely one right answer. What matters is that you look, decide, and can 
 
 On this page we'll clean the **total nitrogen** results for the Logan River at Yarrahappini. In your workbook you'll do the same for your own site and pollutant.
 
+::: {.callout-tip}
+## By the end of this page you'll be able to
+
+- find problems in a dataset with `.value_counts()`
+- decide what to do about quality codes, "<" values, units, duplicates and dates
+- record how many rows each step removes
+- split your data into wet and dry seasons
+:::
+
 ## 1. Load the data
 
 Run this cell first. It loads the practical data into `conc`, just like P1, and sets the site and pollutant we're cleaning.
@@ -138,11 +147,10 @@ is_lt = clean["Operator"] == "<"
 print(is_lt.sum(), "rows below the detection limit")
 ```
 
-There are none for total nitrogen here, but there are for other pollutants. You have two reasonable choices. You can **keep** them, using the limit as the value, which makes those results a little too high. Or you can **drop** them, which loses your lowest results and pushes your averages up. Either is fine if you explain it. To drop them, you'd run this line.
+There are none for total nitrogen here, but there are for other pollutants. You have two reasonable choices. You can **keep** them, using the limit as the value, which makes those results a little too high. Or you can **drop** them, which loses your lowest results and pushes your averages up. Either is fine if you explain it. To drop them, you'd use this line. It's shown here to read, not to run, because the choice is yours.
 
-```{pyodide}
+```python
 clean = clean[clean["Operator"] != "<"]
-print(len(clean), "rows")
 ```
 
 ## 7. Units
@@ -244,6 +252,9 @@ clean["Month"] = clean["Date"].dt.month
 clean["Month"].value_counts()
 ```
 
+![](images/p2-seasons-light.png){.light-content fig-alt="A strip of the twelve months. January, February, March, October, November and December are shaded as the wet season. April to September are shaded as the dry season. The wet season runs from October to March, across the new year."}
+![](images/p2-seasons-dark.png){.dark-content fig-alt="A strip of the twelve months. January, February, March, October, November and December are shaded as the wet season. April to September are shaded as the dry season. The wet season runs from October to March, across the new year."}
+
 The wet season is October to March. We'll start by calling every row `"Dry"`, then change the wet months to `"Wet"`.
 
 ```{pyodide}
@@ -265,6 +276,20 @@ print(len(dry), "dry season samples")
 ```
 
 There are far more wet season samples. That's because WQI sample very often during floods and only monthly when the river is low. Keep that in mind when you compare the seasons.
+
+Here's the whole cleaning record for total nitrogen. In your workbook you'll fill in a table like this for your own data.
+
+![](images/p2-cleaning-record-light.png){.light-content fig-alt="Bar chart of the cleaning record for total nitrogen at Yarrahappini. 1,146 rows for the site and pollutant, 1,089 after keeping quality code 10 only (57 removed), 1,088 after removing blank values (1 removed), 1,087 after removing duplicates (1 removed), and 1,087 after removing dates out of range (0 removed). The last bar splits into 822 wet season and 265 dry season samples."}
+![](images/p2-cleaning-record-dark.png){.dark-content fig-alt="Bar chart of the cleaning record for total nitrogen at Yarrahappini. 1,146 rows for the site and pollutant, 1,089 after keeping quality code 10 only (57 removed), 1,088 after removing blank values (1 removed), 1,087 after removing duplicates (1 removed), and 1,087 after removing dates out of range (0 removed). The last bar splits into 822 wet season and 265 dry season samples."}
+
+::: {.callout-caution}
+## Common mistakes
+
+- Filtering before stripping spaces, so rows with a stray space get missed
+- Not checking the `Unit` column. One value in micrograms can change your answer
+- Reading the dates day first. These dates are month first
+- Not recording how many rows each step removed
+:::
 
 ## In-class activities
 
@@ -540,3 +565,11 @@ When you're ready, put your hand up and show your demonstrator your workbook wit
 
 You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
 :::
+
+## Help and resources
+
+These are optional, for when you want more practice or a different explanation.
+
+- [Selecting and filtering in pandas](https://pandas.pydata.org/docs/getting_started/intro_tutorials/03_subset_data.html). More on picking out rows and columns
+- [Working with dates in pandas](https://pandas.pydata.org/docs/getting_started/intro_tutorials/09_timeseries.html). Turning text into dates, and getting the month
+- [The to_datetime reference](https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html). Every option for reading dates, including `format` and `errors`

@@ -20,6 +20,15 @@ In P3 you described and tested your data. Now you'll show it. A good plot lets s
 
 On this page we'll keep using **total suspended solids** (TSS) at the Logan River at Yarrahappini, the same data as P3.
 
+::: {.callout-tip}
+## By the end of this page you'll be able to
+
+- make a plot with a title and labelled axes, including units
+- compare two groups with a box plot
+- deal with skewed data using a log scale or by zooming in
+- show uncertainty with notches
+:::
+
 ## 1. Start from clean data
 
 As in P3, this cell repeats the P2 cleaning for TSS and runs by itself when the page loads. Scroll inside it if you want to look.
@@ -194,7 +203,8 @@ Every sample is on the plot, and the difference between the seasons is easy to s
 
 Which should you use? A log scale keeps every value on the plot, so it's usually the better choice for skewed data. Zooming is simpler to read if your audience isn't used to log scales. Either is fine if you explain your choice.
 
-## 6. Comparing shapes with histograms
+::: {.callout-tip collapse="true"}
+## Optional. Comparing shapes with histograms
 
 Histograms show the shape of each season in more detail. To compare two seasons with different numbers of samples, add `density=True`, so each histogram is scaled to the same total area. The `alpha` argument makes the bars see-through so both show, and `range` zooms in.
 
@@ -212,8 +222,9 @@ plt.show()
 ```
 
 The `label` arguments and `ax.legend()` add a key, so readers know which colour is which. The dry season has more very low values, while the wet season spreads further to the right.
+:::
 
-## 7. Showing uncertainty
+## 6. Showing uncertainty
 
 A median worked out from a sample is only an estimate. With a different set of samples, you'd get a slightly different median. A good plot shows how uncertain it is.
 
@@ -243,6 +254,9 @@ Here's how to read the notches.
 
 The notch is an approximate guide, not a test. Use it alongside your test from P3, not instead of it.
 
+::: {.callout-tip collapse="true"}
+## Optional. A confidence interval for the mean
+
 You can also work out a 95% confidence interval for the **mean**. It comes from the **standard error**, the standard deviation divided by the square root of the number of samples. The interval stretches 1.96 standard errors either side of the mean, and `** 0.5` takes a square root.
 
 ```{pyodide}
@@ -254,8 +268,9 @@ summary.round(1)
 ```
 
 The wet season mean is 476 ± 54 mg/L, and the dry season mean is 378 ± 88 mg/L. Those intervals overlap. For skewed data like this, though, the mean isn't the best summary, so the notched box plot is the more useful picture.
+:::
 
-## 8. Is your hypothesis supported?
+## 7. Is your hypothesis supported?
 
 Now bring everything together, your summary table, your test, your check and your plot. For TSS at Yarrahappini, it might look like this.
 
@@ -268,6 +283,15 @@ A good figure for your workbook has all of these.
 - Something that shows the spread of the data, not just an average
 - Something that shows uncertainty, like notches, with the number of samples
 - An honest axis, with any zooming explained
+
+::: {.callout-caution}
+## Common mistakes
+
+- Leaving out units, or using a log scale without saying so in the label
+- Using a bar chart of means, which hides the spread of the data
+- Zooming in without saying that some values are off the plot
+- Treating overlapping notches as proof there's no difference. They're a guide, not a test
+:::
 
 ## In-class activities
 
@@ -499,7 +523,7 @@ In P3, the t-test found no difference for particulate nitrogen, but Mann-Whitney
 
 ### Activity 3. Notches
 
-You'll need sections 5 and 7.
+You'll need sections 5 and 6.
 
 Make a notched box plot on a log scale for **filterable reactive phosphorus**, with the number of samples in each label.
 
@@ -740,3 +764,11 @@ When you're ready, put your hand up and show your demonstrator your workbook wit
 
 This is the check-off that confirms your workbook is your own work, so your workbook can only be marked once it's complete. You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at the Week 12 drop-in.
 :::
+
+## Help and resources
+
+These are optional, for when you want more practice or a different explanation.
+
+- [Matplotlib quick start](https://matplotlib.org/stable/users/explain/quick_start.html). The official introduction to making plots
+- [The box plot reference](https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.boxplot.html). Every option for `boxplot`, including `notch`
+- [From Data to Viz](https://www.data-to-viz.com/). A guide to choosing the right kind of chart for your data

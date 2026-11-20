@@ -17,6 +17,15 @@ The first time you open this page, Python takes a few seconds to load. Wait unti
 
 This is a practical page, not your assessment. You don't hand anything in from here. At the end of today's session you'll open your **assessment workbook** in Colab and start on it.
 
+::: {.callout-tip}
+## By the end of this page you'll be able to
+
+- run code cells, and read the errors they give you
+- do maths and store results in variables
+- load a CSV file into a table with pandas
+- look at a table and pick out the rows you want
+:::
+
 ## 1. Running code on this page
 
 Each grey box below is a **code cell**. Click **Run Code** and the output appears underneath.
@@ -25,7 +34,7 @@ Each grey box below is a **code cell**. Click **Run Code** and the output appear
 print("Hello from Python")
 ```
 
-You can change any cell and run it again. Try changing the message above to your name.
+You can change any cell and run it again. Try changing the message above to your name. If you get a cell into a mess, the **Start Over** button puts back the original code.
 
 Cells on this page share what they've made, so a cell can use a variable made in an earlier cell. That means you need to **run the cells in order, from the top**. If you reload the page, Python forgets everything and you start again from the top.
 
@@ -275,6 +284,15 @@ print(good_tss["Value"].mean())
 
 Quality code 10 means WQI rates the result as good. You'll decide which quality codes to keep in P2.
 
+::: {.callout-caution}
+## Common mistakes
+
+- Running cells out of order, so a variable doesn't exist yet (`NameError`)
+- Using `=` when you mean `==`. One stores a value, and two compare
+- A column name that doesn't match exactly, including capitals and spaces (`KeyError`)
+- Forgetting the quotes around text, like a site code or an analyte name
+:::
+
 ## In-class activities
 
 Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look.
@@ -291,7 +309,7 @@ Handily, mg/L multiplied by ML gives you kg straight away, because a megalitre i
 
 ```{pyodide}
 #| exercise: ex_load_maths
-conc_mg_per_L = 0.85
+tn_mg_per_L = 0.85
 flow_ML_per_day = 1200
 
 load_kg_per_day = ______
@@ -303,15 +321,15 @@ Multiply the two variables together.
 :::
 
 ::: {.hint exercise="ex_load_maths"}
-`load_kg_per_day = conc_mg_per_L * flow_ML_per_day`
+`load_kg_per_day = tn_mg_per_L * flow_ML_per_day`
 :::
 
 ::: {.solution exercise="ex_load_maths"}
 ```python
-conc_mg_per_L = 0.85
+tn_mg_per_L = 0.85
 flow_ML_per_day = 1200
 
-load_kg_per_day = conc_mg_per_L * flow_ML_per_day
+load_kg_per_day = tn_mg_per_L * flow_ML_per_day
 print(load_kg_per_day)
 ```
 :::
@@ -478,6 +496,10 @@ Your assessment workbook isn't on this page. It's a **Google Colab** notebook, a
 
 Click the **Open in Colab** button on the Canvas assessment page. The workbook opens as a read-only copy, so go straight to **File > Save a copy in Drive** and work in the copy that opens. Its name starts with "Copy of". If you skip this step, your work won't be saved.
 
+<!-- SCREENSHOT PLACEHOLDER for Michael. Save the screenshot as practicals/images/p1-colab-save-copy.png, then delete this line and the last line of this comment so the image line below shows.
+![](images/p1-colab-save-copy.png){fig-alt="The Colab File menu open, with Save a copy in Drive highlighted."}
+-->
+
 Your copy lives in your Google Drive, in a folder called Colab Notebooks. Next time, open it from there, not from the Canvas button.
 
 ### Running cells
@@ -489,6 +511,10 @@ Colab also has text cells for writing. Double-click one to edit it, and press **
 ### Starting fresh
 
 The **Runtime > Restart session and run all** menu option wipes everything and runs every cell from the top. Your workbook has to pass this test, and you'll do it at each check-off.
+
+<!-- SCREENSHOT PLACEHOLDER for Michael. Save the screenshot as practicals/images/p1-colab-restart-run-all.png, then delete this line and the last line of this comment so the image line below shows.
+![](images/p1-colab-restart-run-all.png){fig-alt="The Colab Runtime menu open, with Restart session and run all highlighted."}
+-->
 
 ### GenAI
 
@@ -517,3 +543,11 @@ When you're ready, put your hand up and show your demonstrator your workbook wit
 
 You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
 :::
+
+## Help and resources
+
+These are optional, for when you want more practice or a different explanation.
+
+- [Colab basic features](https://colab.research.google.com/notebooks/basic_features_overview.ipynb). Google's own short tour of Colab
+- [Colab questions and answers](https://research.google.com/colaboratory/faq.html). Answers to common Colab questions, like where your files are saved
+- [Getting started with pandas](https://pandas.pydata.org/docs/getting_started/intro_tutorials/index.html). Short official tutorials on loading and looking at tables
