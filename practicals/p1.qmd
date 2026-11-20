@@ -275,30 +275,6 @@ print(good_tss["Value"].mean())
 
 Quality code 10 means WQI rates the result as good. You'll decide which quality codes to keep in P2.
 
-## 9. Moving to Colab for your assessment
-
-Your assessment workbook isn't on this page. It's a **Google Colab** notebook. Colab runs Python too, but it works a bit differently, and you'll switch to it at the end of today's practical. You'll need a Google account.
-
-### Opening your workbook
-
-Click the **Open in Colab** button on the Canvas assessment page. The workbook opens as a read-only copy, so go straight to **File > Save a copy in Drive** and work in the copy that opens. Its name starts with "Copy of". If you skip this step, your work won't be saved.
-
-Your copy lives in your Google Drive, in a folder called Colab Notebooks. Next time, open it from there, not from the Canvas button.
-
-### Running cells
-
-Click the play button on the left of a cell, or press **Shift + Enter**. Like this page, Colab remembers what you've run in the order you ran it.
-
-Colab also has text cells for writing. Double-click one to edit it, and press **Shift + Enter** when you're done.
-
-### Starting fresh
-
-The **Runtime > Restart session and run all** menu option wipes everything and runs every cell from the top. Your workbook has to pass this test, and you'll do it at each check-off.
-
-### GenAI
-
-Colab may offer to write code for you. You can use GenAI on your workbook, but not during check-offs, where you run and explain your analysis yourself. Make sure you understand every line.
-
 ## In-class activities
 
 Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look. If you finish early, there's extra practice at the bottom of the page.
@@ -496,7 +472,31 @@ In your workbook, `conc` is already loaded for you by the first cells, so you do
 
 ## Bridge to your assessment
 
-Your assessment data has the same columns as the practical data. Now you'll do the same first steps on it.
+Your assessment workbook isn't on this page. It's a **Google Colab** notebook, and you'll switch to it now. Colab runs Python too, but it works a bit differently. You'll need a Google account.
+
+### Opening your workbook
+
+Click the **Open in Colab** button on the Canvas assessment page. The workbook opens as a read-only copy, so go straight to **File > Save a copy in Drive** and work in the copy that opens. Its name starts with "Copy of". If you skip this step, your work won't be saved.
+
+Your copy lives in your Google Drive, in a folder called Colab Notebooks. Next time, open it from there, not from the Canvas button.
+
+### Running cells
+
+Click the play button on the left of a cell, or press **Shift + Enter**. Like this page, Colab remembers what you've run in the order you ran it.
+
+Colab also has text cells for writing. Double-click one to edit it, and press **Shift + Enter** when you're done.
+
+### Starting fresh
+
+The **Runtime > Restart session and run all** menu option wipes everything and runs every cell from the top. Your workbook has to pass this test, and you'll do it at each check-off.
+
+### GenAI
+
+Colab may offer to write code for you. You can use GenAI on your workbook, but not during check-offs, where you run and explain your analysis yourself. Make sure you understand every line.
+
+### Your first steps
+
+Your assessment data has the same columns as the practical data, so you'll do the same first steps on it.
 
 1. Open your **assessment workbook** from the **Open in Colab** button on Canvas.
 2. Go to **File > Save a copy in Drive**, and work in your copy from now on.
@@ -505,7 +505,18 @@ Your assessment data has the same columns as the practical data. Now you'll do t
 5. Paste your workbook code into Section 1. Change `my_site` and `my_analyte` to your site code and analyte, written exactly as they appear in the data, and run it.
 6. Write your hypothesis, null hypothesis and predicted direction (wet or dry season higher, and why) in Section 1.
 
-That's check-off 1. When you're ready, put your hand up and your demonstrator will come and see it.
+::: {.checkoff}
+### Check-off 1
+
+When you're ready, put your hand up and show your demonstrator your workbook with these done.
+
+- Your own saved copy is open in Colab (its name starts with "Copy of").
+- The loader and sanity-check cells have run.
+- Your Section 1 code has run for your allocated site and pollutant.
+- Your hypothesis, null hypothesis and predicted direction are written in Section 1.
+
+You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
+:::
 
 ## Extra practice (optional)
 
