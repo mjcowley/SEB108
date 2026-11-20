@@ -31,13 +31,13 @@ Cells on this page share what they've made, so a cell can use a variable made in
 
 ## 2. Numbers, maths and variables
 
-Python works like a calculator. Here are three turbidity readings from a creek, in NTU. Work out their mean on your calculator first, then run the cell and check that Python agrees.
+Python works like a calculator. Say you measured the water temperature in a creek on three days and got 21.5, 19.0 and 25.5 °C. Work out the average on your calculator first, then run the cell and check that Python agrees.
 
 ```{pyodide}
-(12.4 + 8.1 + 35.0) / 3
+(21.5 + 19.0 + 25.5) / 3
 ```
 
-The brackets matter. Without them, Python divides 35.0 by 3 first and then adds, following the same order of operations as maths. Take the brackets out and run it again to see the difference.
+The brackets matter. Without them, Python divides 25.5 by 3 first and then adds, following the same order of operations as maths. Take the brackets out and run it again to see the difference.
 
 To keep a result, store it in a **variable** with `=`.
 
