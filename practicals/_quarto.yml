@@ -10,10 +10,10 @@ website:
     contents:
       - text: "Home"
         href: index.qmd
-      - text: "P1: Python basics"
+      - text: "P1 Python basics"
         href: p1.qmd
       # Add P2 to P4 here as they're written:
-      # - text: "P2: Cleaning data"
+      # - text: "P2 Cleaning data"
       #   href: p2.qmd
 
 format:
