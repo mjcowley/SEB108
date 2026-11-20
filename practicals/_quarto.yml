@@ -14,7 +14,9 @@ website:
         href: p1.qmd
       - text: "P2 Cleaning data"
         href: p2.qmd
-      # Add P3 and P4 here as they're written
+      - text: "P3 Describe and test"
+        href: p3.qmd
+      # Add P4 here when it's written
 
 format:
   live-html:

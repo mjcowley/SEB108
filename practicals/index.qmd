@@ -12,7 +12,7 @@ Your **assessment workbook** is separate. It's a Colab notebook you open from Ca
 |---|---|
 | 8 | [P1 Python basics](p1.qmd) |
 | 9 | [P2 Cleaning data](p2.qmd) |
-| 10 | P3 Describe and test |
+| 10 | [P3 Describe and test](p3.qmd) |
 | 11 | P4 Visualise |
 
 ::: {.callout-tip}

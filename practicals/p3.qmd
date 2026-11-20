@@ -1,0 +1,715 @@
+---
+title: "P3 Describe and test"
+subtitle: "Week 10. Python runs in your browser, so there's nothing to install, save or submit."
+engine: markdown
+resources:
+  - data/yarrahappini_concentration.csv
+pyodide:
+  packages:
+    - pandas
+    - scipy
+    - matplotlib
+  resources:
+    - data/yarrahappini_concentration.csv
+---
+
+::: {.callout-note}
+The first time you open this page, Python takes a few seconds to load. Wait until the code cells show a **Run Code** button.
+:::
+
+Now your data is clean, you can start answering the question. Are concentrations different in the wet season and the dry season?
+
+You'll do it in three steps. First you **describe** each season with a few numbers. Then you **test** whether the difference could just be chance. Then you **check** whether your answer holds up when you do it a different way. That last step matters more than you might think, as you'll see.
+
+On this page we'll use **total suspended solids** (TSS) at the Logan River at Yarrahappini. TSS is the amount of sediment in the water.
+
+## 1. Start from clean data
+
+This cell repeats the P2 cleaning for TSS, so you start with `clean`, `wet` and `dry`. It runs by itself when the page loads, and you've seen every line before. Scroll inside it if you want to look.
+
+```{pyodide}
+#| autorun: true
+#| max-lines: 8
+#| caption: Cleaning from P2
+import pandas as pd
+
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+my_site = "145014A"
+my_analyte = "Total suspended solids"
+
+# Tidy stray spaces
+clean = conc.copy()
+for col in ["Site Code", "Analyte", "Unit", "Operator"]:
+    clean[col] = clean[col].str.strip()
+
+# Your site and pollutant
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+print(len(clean), "rows to start")
+
+# Quality codes (your decision)
+keep_codes = [10]
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "removed by quality code")
+
+# Blank values
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "removed as blank")
+
+# "<" values (your decision). To drop them,
+# remove the # from the start of the next line.
+# clean = clean[clean["Operator"] != "<"]
+lt = (clean["Operator"] == "<").sum()
+print(lt, "rows below the detection limit kept")
+
+# Units
+is_ug = clean["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "values converted from micrograms")
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+# Duplicates
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "removed as duplicates")
+
+# Dates, month first, then fix the odd ones
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+odd = clean.loc[dates.isna(), "Date Time"]
+print("Dates that didn't fit")
+print(odd)
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+# Dates outside the monitoring period (your decision)
+first_date = "2007-07-01"
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "removed as out of range")
+
+# Seasons
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Date"].dt.month.isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet and", len(dry), "dry samples")
+```
+
+## 2. Describe each season
+
+Start with the numbers that describe each season. The **mean** is the average. The **median** is the middle value when they're sorted, so half the samples are above it and half below. The **standard deviation** (std) measures how spread out the values are.
+
+The `.groupby()` method splits the table into groups, here one for each season, and `.agg()` works out several numbers for each group at once.
+
+```{pyodide}
+summary = clean.groupby("Season")["Value"].agg(
+    ["count", "mean", "median", "std"])
+summary.round(1)
+```
+
+Both the mean and the median are higher in the wet season. But look at how different they are. The wet season mean is about twice its median, and the standard deviations are bigger than the means.
+
+## 3. Why the mean and median disagree
+
+A histogram shows how the values are spread out. Each bar counts how many samples fall in a range of values.
+
+```{pyodide}
+import matplotlib.pyplot as plt
+
+wet["Value"].hist(bins=40)
+plt.xlabel("TSS (mg/L)")
+plt.ylabel("Number of samples")
+plt.title("Wet season")
+plt.show()
+```
+
+Most samples are fairly low, but a few are enormous. These come from floods, when the river carries huge amounts of sediment. The shape has a long tail to the right, which is called **right-skewed**.
+
+A handful of huge values pull the mean up a long way, but they barely move the median, because the median only cares about the middle. That's why the mean and median disagree, and why the median is often the better summary for data like this.
+
+Try the same histogram for `dry`.
+
+## 4. The two-sample t-test
+
+The seasons look different, but samples always vary a bit. A **t-test** asks whether the gap between the two means is bigger than you'd expect from chance alone.
+
+The `scipy` library has the statistics. The `stats.ttest_ind()` function compares two independent groups.
+
+```{pyodide}
+from scipy import stats
+
+result = stats.ttest_ind(wet["Value"], dry["Value"])
+print("t =", round(result.statistic, 2))
+print("p =", round(result.pvalue, 3))
+```
+
+The **p-value** answers one question. If there were really no difference between the seasons, how often would you see a gap this big just by chance? Here p is about 0.075, so a gap this big would turn up about 7.5% of the time by chance alone.
+
+The usual cut-off is 0.05. A p-value below 0.05 counts as a **significant** difference. This one is above 0.05, so the t-test says there isn't enough evidence that the mean TSS differs between the seasons.
+
+That might seem odd, given the wet season mean is 100 mg/L higher. Keep reading.
+
+## 5. The t-test's assumptions
+
+A test only gives a trustworthy answer if its assumptions are met. The t-test assumes three things.
+
+1. The values in each group are roughly **normally distributed**, a symmetrical bell shape. Section 3 showed ours are strongly skewed.
+2. The two groups have a similar **spread**. Ours have large standard deviations driven by a few floods.
+3. Each sample is **independent** of the others. WQI often take several samples on the same day during a flood, and samples a few hours apart aren't independent.
+
+With hundreds of samples the t-test copes with some skew, but a few extreme values still swamp the means. So for this data, the t-test result is shaky. Your job in the workbook is to name at least one assumption that's shaky for your data and explain why.
+
+## 6. Check your result
+
+When an assumption is shaky, check whether your conclusion survives a test that doesn't rely on it. In your workbook you'll do at least one of these checks. Here are all four.
+
+### Welch's t-test
+
+Welch's version of the t-test doesn't assume the two seasons have the same spread. Adding `equal_var=False` turns it on.
+
+```{pyodide}
+welch = stats.ttest_ind(wet["Value"], dry["Value"],
+                        equal_var=False)
+print("p =", round(welch.pvalue, 3))
+```
+
+Still above 0.05. Welch fixes the spread problem, but it still compares means, so the floods still dominate.
+
+### Mann-Whitney U test
+
+The Mann-Whitney U test doesn't use the values themselves. It puts every sample in order and asks whether one season's samples tend to rank higher. A few huge floods are just the highest ranks, so they can't swamp the answer.
+
+```{pyodide}
+mw = stats.mannwhitneyu(wet["Value"], dry["Value"])
+print("p =", mw.pvalue)
+```
+
+The p-value is tiny. A number like `2.3e-08` means 2.3 times ten to the power of minus 8, or 0.000000023, far below 0.05. Wet season samples really do tend to be higher. The check has **changed the conclusion**. The t-test couldn't see the difference because a few floods made the means too noisy.
+
+### Without 2021-22
+
+The 2021-22 year includes the February 2022 flood. Rerunning the test without it shows whether one extreme year is driving the result. The `!=` comparison means "not equal to".
+
+```{pyodide}
+no_flood = clean[clean["Sampling Year"] != "2021-2022"]
+w = no_flood[no_flood["Season"] == "Wet"]["Value"]
+d = no_flood[no_flood["Season"] == "Dry"]["Value"]
+print("p =", round(stats.ttest_ind(w, d).pvalue, 3))
+```
+
+### One value per sampling day
+
+To deal with repeated samples on the same day, average each day's samples so every day counts once. The `.dt.date` attribute gets just the date, without the time.
+
+```{pyodide}
+clean["Day"] = clean["Date"].dt.date
+daily = clean.groupby(["Day", "Season"],
+                      as_index=False)["Value"].mean()
+print(daily["Season"].value_counts())
+
+w = daily[daily["Season"] == "Wet"]["Value"]
+d = daily[daily["Season"] == "Dry"]["Value"]
+print("p =", round(stats.ttest_ind(w, d).pvalue, 3))
+```
+
+Notice how many fewer values there are. The 822 wet season samples came from only 364 different days.
+
+## 7. Saying what you found
+
+A good result statement says what you compared, what you found, and how sure you are. Write p-values to two or three decimal places, or as "p < 0.001" when they're tiny. For TSS at Yarrahappini, it might look like this.
+
+> The median TSS was 223 mg/L in the wet season and 128 mg/L in the dry season. A two-sample t-test found no significant difference in means (p = 0.075). However, the data are strongly right-skewed, and a Mann-Whitney U test found a significant difference (p < 0.001). Wet season TSS tends to be higher, but a few very large flood samples make the means too variable for the t-test to detect it.
+
+## In-class activities
+
+Each exercise starts with that pollutant's data already cleaned, as `clean`, `wet` and `dry`. Have a real go before you look at the hints.
+
+### Activity 1. Describe the seasons
+
+You'll need sections 2 and 3.
+
+Make a summary table for **dissolved organic nitrogen**, then answer the questions below the cell.
+
+```{pyodide}
+#| exercise: ex_describe
+#| setup: true
+import pandas as pd
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+my_site = "145014A"
+my_analyte = "Dissolved organic nitrogen as N"
+# Tidy stray spaces
+clean = conc.copy()
+for col in ["Site Code", "Analyte", "Unit", "Operator"]:
+    clean[col] = clean[col].str.strip()
+
+# Your site and pollutant
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+print(len(clean), "rows to start")
+
+# Quality codes (your decision)
+keep_codes = [10]
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "removed by quality code")
+
+# Blank values
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "removed as blank")
+
+# "<" values (your decision). To drop them,
+# remove the # from the start of the next line.
+# clean = clean[clean["Operator"] != "<"]
+lt = (clean["Operator"] == "<").sum()
+print(lt, "rows below the detection limit kept")
+
+# Units
+is_ug = clean["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "values converted from micrograms")
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+# Duplicates
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "removed as duplicates")
+
+# Dates, month first, then fix the odd ones
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+odd = clean.loc[dates.isna(), "Date Time"]
+print("Dates that didn't fit")
+print(odd)
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+# Dates outside the monitoring period (your decision)
+first_date = "2007-07-01"
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "removed as out of range")
+
+# Seasons
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Date"].dt.month.isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet and", len(dry), "dry samples")
+```
+
+```{pyodide}
+#| exercise: ex_describe
+summary = clean.______("Season")["Value"].agg(
+    ["count", "______", "______", "std"])
+summary.round(3)
+```
+
+::: {.hint exercise="ex_describe"}
+The method that splits the table into groups is the same one as in section 2. The two missing numbers are the average and the middle value.
+:::
+
+::: {.hint exercise="ex_describe"}
+Use `.groupby`, then `"mean"` and `"median"`.
+:::
+
+::: {.solution exercise="ex_describe"}
+```python
+summary = clean.groupby("Season")["Value"].agg(
+    ["count", "mean", "median", "std"])
+summary.round(3)
+```
+:::
+
+Which season is higher? Are the mean and median close together this time, or far apart like TSS? What does that tell you about the shape of the data?
+
+### Activity 2. When the tests disagree
+
+You'll need sections 4 and 6.
+
+For **particulate nitrogen**, run a t-test and a Mann-Whitney U test, then answer the questions below the cell.
+
+```{pyodide}
+#| exercise: ex_tests
+#| setup: true
+import pandas as pd
+from scipy import stats
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+my_site = "145014A"
+my_analyte = "Particulate nitrogen as N"
+# Tidy stray spaces
+clean = conc.copy()
+for col in ["Site Code", "Analyte", "Unit", "Operator"]:
+    clean[col] = clean[col].str.strip()
+
+# Your site and pollutant
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+print(len(clean), "rows to start")
+
+# Quality codes (your decision)
+keep_codes = [10]
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "removed by quality code")
+
+# Blank values
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "removed as blank")
+
+# "<" values (your decision). To drop them,
+# remove the # from the start of the next line.
+# clean = clean[clean["Operator"] != "<"]
+lt = (clean["Operator"] == "<").sum()
+print(lt, "rows below the detection limit kept")
+
+# Units
+is_ug = clean["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "values converted from micrograms")
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+# Duplicates
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "removed as duplicates")
+
+# Dates, month first, then fix the odd ones
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+odd = clean.loc[dates.isna(), "Date Time"]
+print("Dates that didn't fit")
+print(odd)
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+# Dates outside the monitoring period (your decision)
+first_date = "2007-07-01"
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "removed as out of range")
+
+# Seasons
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Date"].dt.month.isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet and", len(dry), "dry samples")
+```
+
+```{pyodide}
+#| exercise: ex_tests
+t = stats.______(wet["Value"], dry["Value"])
+mw = stats.______(wet["Value"], dry["Value"])
+print("t-test p =", round(t.pvalue, 3))
+print("Mann-Whitney p =", mw.pvalue)
+
+print("Medians", wet["Value"].median(),
+      dry["Value"].median())
+print("Means", wet["Value"].mean(), dry["Value"].mean())
+```
+
+::: {.hint exercise="ex_tests"}
+Both functions are in `stats`. Check section 4 for the t-test and section 6 for Mann-Whitney.
+:::
+
+::: {.hint exercise="ex_tests"}
+Use `stats.ttest_ind` and `stats.mannwhitneyu`.
+:::
+
+::: {.solution exercise="ex_tests"}
+```python
+t = stats.ttest_ind(wet["Value"], dry["Value"])
+mw = stats.mannwhitneyu(wet["Value"], dry["Value"])
+print("t-test p =", round(t.pvalue, 3))
+print("Mann-Whitney p =", mw.pvalue)
+
+print("Medians", wet["Value"].median(),
+      dry["Value"].median())
+print("Means", wet["Value"].mean(), dry["Value"].mean())
+```
+:::
+
+The two tests disagree. Look at the means and the medians. Which test do you trust more for this data, and why?
+
+### Activity 3. One value per day
+
+You'll need section 6.
+
+For **filterable reactive phosphorus**, reduce the data to one value per sampling day, then run the t-test again.
+
+```{pyodide}
+#| exercise: ex_daily
+#| setup: true
+import pandas as pd
+from scipy import stats
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+my_site = "145014A"
+my_analyte = "Filterable Reactive phosphorus as P"
+# Tidy stray spaces
+clean = conc.copy()
+for col in ["Site Code", "Analyte", "Unit", "Operator"]:
+    clean[col] = clean[col].str.strip()
+
+# Your site and pollutant
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+print(len(clean), "rows to start")
+
+# Quality codes (your decision)
+keep_codes = [10]
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "removed by quality code")
+
+# Blank values
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "removed as blank")
+
+# "<" values (your decision). To drop them,
+# remove the # from the start of the next line.
+# clean = clean[clean["Operator"] != "<"]
+lt = (clean["Operator"] == "<").sum()
+print(lt, "rows below the detection limit kept")
+
+# Units
+is_ug = clean["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "values converted from micrograms")
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+# Duplicates
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "removed as duplicates")
+
+# Dates, month first, then fix the odd ones
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+odd = clean.loc[dates.isna(), "Date Time"]
+print("Dates that didn't fit")
+print(odd)
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+# Dates outside the monitoring period (your decision)
+first_date = "2007-07-01"
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "removed as out of range")
+
+# Seasons
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Date"].dt.month.isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet and", len(dry), "dry samples")
+```
+
+```{pyodide}
+#| exercise: ex_daily
+clean["Day"] = clean["Date"].dt.______
+daily = clean.groupby(["Day", "Season"],
+                      as_index=False)["Value"].______()
+
+w = daily[daily["Season"] == "Wet"]["Value"]
+d = daily[daily["Season"] == "Dry"]["Value"]
+print(len(w), "wet days and", len(d), "dry days")
+print("p =", round(stats.ttest_ind(w, d).pvalue, 4))
+```
+
+::: {.hint exercise="ex_daily"}
+You want just the date part of each date and time. Then you want the average of each day's values.
+:::
+
+::: {.hint exercise="ex_daily"}
+Use `.dt.date`, then `.mean()`.
+:::
+
+::: {.solution exercise="ex_daily"}
+```python
+clean["Day"] = clean["Date"].dt.date
+daily = clean.groupby(["Day", "Season"],
+                      as_index=False)["Value"].mean()
+
+w = daily[daily["Season"] == "Wet"]["Value"]
+d = daily[daily["Season"] == "Dry"]["Value"]
+print(len(w), "wet days and", len(d), "dry days")
+print("p =", round(stats.ttest_ind(w, d).pvalue, 4))
+```
+:::
+
+How many samples did you start with, and how many days? Is the difference still significant once each day counts once?
+
+## Your workbook code, copy from here
+
+This is the code for Section 3 of your assessment workbook. It makes the summary table and histograms, runs the t-test, then runs all four checks. In your workbook you only need to explain **one** check, but it does no harm to look at them all.
+
+It uses `clean`, `wet` and `dry` from your Section 2 code, so run Section 2 first. The p-values are printed in full. If one looks like `3.2e-07`, it's tiny, so write it as p < 0.001.
+
+```{pyodide}
+#| exercise: workbook_code
+#| setup: true
+import pandas as pd
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+my_site = "145014A"
+my_analyte = "Total suspended solids"
+# Tidy stray spaces
+clean = conc.copy()
+for col in ["Site Code", "Analyte", "Unit", "Operator"]:
+    clean[col] = clean[col].str.strip()
+
+# Your site and pollutant
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+print(len(clean), "rows to start")
+
+# Quality codes (your decision)
+keep_codes = [10]
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "removed by quality code")
+
+# Blank values
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "removed as blank")
+
+# "<" values (your decision). To drop them,
+# remove the # from the start of the next line.
+# clean = clean[clean["Operator"] != "<"]
+lt = (clean["Operator"] == "<").sum()
+print(lt, "rows below the detection limit kept")
+
+# Units
+is_ug = clean["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "values converted from micrograms")
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+# Duplicates
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "removed as duplicates")
+
+# Dates, month first, then fix the odd ones
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+odd = clean.loc[dates.isna(), "Date Time"]
+print("Dates that didn't fit")
+print(odd)
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+# Dates outside the monitoring period (your decision)
+first_date = "2007-07-01"
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "removed as out of range")
+
+# Seasons
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Date"].dt.month.isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet and", len(dry), "dry samples")
+```
+
+```{pyodide}
+#| exercise: workbook_code
+#| caption: Your workbook code
+import matplotlib.pyplot as plt
+from scipy import stats
+
+# Describe each season
+summary = clean.groupby("Season")["Value"].agg(
+    ["count", "mean", "median", "std"])
+print(summary.round(3))
+
+# Shape of each season
+wet["Value"].hist(bins=40)
+plt.title("Wet season")
+plt.show()
+dry["Value"].hist(bins=40)
+plt.title("Dry season")
+plt.show()
+
+# Two-sample t-test
+t = stats.ttest_ind(wet["Value"], dry["Value"])
+print("t-test p =", t.pvalue)
+
+# Check 1. Welch's t-test
+welch = stats.ttest_ind(wet["Value"], dry["Value"],
+                        equal_var=False)
+print("Welch p =", welch.pvalue)
+
+# Check 2. Mann-Whitney U test
+mw = stats.mannwhitneyu(wet["Value"], dry["Value"])
+print("Mann-Whitney p =", mw.pvalue)
+
+# Check 3. Without 2021-22
+no_flood = clean[clean["Sampling Year"] != "2021-2022"]
+w = no_flood[no_flood["Season"] == "Wet"]["Value"]
+d = no_flood[no_flood["Season"] == "Dry"]["Value"]
+print("Without 2021-22 p =",
+      stats.ttest_ind(w, d).pvalue)
+
+# Check 4. One value per sampling day
+clean["Day"] = clean["Date"].dt.date
+daily = clean.groupby(["Day", "Season"],
+                      as_index=False)["Value"].mean()
+w = daily[daily["Season"] == "Wet"]["Value"]
+d = daily[daily["Season"] == "Dry"]["Value"]
+print("One per day p =",
+      stats.ttest_ind(w, d).pvalue)
+```
+
+## Bridge to your assessment
+
+1. Open **your saved copy** of the workbook from your Google Drive.
+2. Run everything so far with **Runtime > Run all**.
+3. Paste your workbook code into the code cell in Section 3 and run it.
+4. Answer the Section 3 questions in your workbook. Describe each season, say what the t-test p-value means in words, name an assumption that's shaky for your data, then pick one check and say whether it changed your conclusion.
+
+::: {.checkoff}
+### Check-off 3
+
+When you're ready, put your hand up and show your demonstrator your workbook with these done.
+
+- Your Section 3 code runs for your site and pollutant.
+- You can describe each season using your summary table, including whether the mean and median agree.
+- You can say what your t-test p-value means in words.
+- You can name one shaky assumption, and say whether your check changed your conclusion.
+
+You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
+:::
