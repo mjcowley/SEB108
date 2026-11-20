@@ -496,9 +496,7 @@ Your assessment workbook isn't on this page. It's a **Google Colab** notebook, a
 
 Click the **Open in Colab** button on the Canvas assessment page. The workbook opens as a read-only copy, so go straight to **File > Save a copy in Drive** and work in the copy that opens. Its name starts with "Copy of". If you skip this step, your work won't be saved.
 
-<!-- SCREENSHOT PLACEHOLDER for Michael. Save the screenshot as practicals/images/p1-colab-save-copy.png, then delete this line and the last line of this comment so the image line below shows.
 ![](images/p1-colab-save-copy.png){fig-alt="The Colab File menu open, with Save a copy in Drive highlighted."}
--->
 
 Your copy lives in your Google Drive, in a folder called Colab Notebooks. Next time, open it from there, not from the Canvas button.
 
@@ -512,9 +510,7 @@ Colab also has text cells for writing. Double-click one to edit it, and press **
 
 The **Runtime > Restart session and run all** menu option wipes everything and runs every cell from the top. Your workbook has to pass this test, and you'll do it at each check-off.
 
-<!-- SCREENSHOT PLACEHOLDER for Michael. Save the screenshot as practicals/images/p1-colab-restart-run-all.png, then delete this line and the last line of this comment so the image line below shows.
 ![](images/p1-colab-restart-run-all.png){fig-alt="The Colab Runtime menu open, with Restart session and run all highlighted."}
--->
 
 ### GenAI
 
