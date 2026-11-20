@@ -1,0 +1,542 @@
+---
+title: "P2 Cleaning data"
+subtitle: "Week 9. Python runs in your browser, so there's nothing to install, save or submit."
+engine: markdown
+resources:
+  - data/yarrahappini_concentration.csv
+pyodide:
+  packages:
+    - pandas
+  resources:
+    - data/yarrahappini_concentration.csv
+---
+
+::: {.callout-note}
+The first time you open this page, Python takes a few seconds to load. Wait until the code cells show a **Run Code** button.
+:::
+
+Every real dataset has problems. Some are mistakes, some are just how the data was recorded, and some only matter for certain questions. Cleaning means finding them, deciding what to do about each one, and keeping a record of how many rows each decision removed.
+
+There's rarely one right answer. What matters is that you look, decide, and can explain why. That's exactly what you'll do in Section 2 of your workbook, and what your demonstrator will ask about at check-off 2.
+
+On this page we'll clean the **total nitrogen** results for the Logan River at Yarrahappini. In your workbook you'll do the same for your own site and pollutant.
+
+## 1. Load the data
+
+Run this cell first. It loads the practical data into `conc`, just like P1, and sets the site and pollutant we're cleaning.
+
+```{pyodide}
+import pandas as pd
+
+file = "data/yarrahappini_concentration.csv"
+conc = pd.read_csv(file)
+
+my_site = "145014A"
+my_analyte = "Total nitrogen as N"
+print(len(conc), "rows")
+```
+
+## 2. Look before you clean
+
+Before you change anything, look at what's in each column. The `.value_counts()` method from P1 is the best tool for this, because it shows every different value and how often it appears.
+
+```{pyodide}
+print(conc["Site Code"].value_counts())
+print(conc["Unit"].value_counts())
+```
+
+There are already two problems here. One site code has a space on the end, so Python treats it as a different site. And two results are in micrograms per litre, when everything else is in milligrams per litre.
+
+```{pyodide}
+print(conc["Operator"].value_counts(dropna=False))
+print(conc["Quality Code"].value_counts())
+```
+
+Adding `dropna=False` makes `.value_counts()` count the blanks too. In the `Operator` column, a blank (shown as `NaN`) means a normal result. A `<` means the result was below what the laboratory can measure, and `IS` or `NR` mean there's no result at all. The quality codes 10, 20 and 125 are explained on the **Assessment Brief and Data** page on Canvas.
+
+We'll deal with each of these in turn.
+
+## 3. Stray spaces
+
+Spaces at the start or end of a value are invisible when you look at the data, but they stop an exact match. The `.str.strip()` method removes them.
+
+We'll make a copy of the data called `clean` and fix that, so the original `conc` stays as it was.
+
+```{pyodide}
+clean = conc.copy()
+clean["Site Code"] = clean["Site Code"].str.strip()
+clean["Analyte"] = clean["Analyte"].str.strip()
+clean["Unit"] = clean["Unit"].str.strip()
+clean["Operator"] = clean["Operator"].str.strip()
+
+clean["Site Code"].value_counts()
+```
+
+Now there's only one site code. We tidied `Analyte`, `Unit` and `Operator` too, just in case. It doesn't hurt.
+
+## 4. Pick your rows, and count what you remove
+
+Next, keep only the rows for our site and pollutant, using the filtering from P1. Adding `.copy()` on the end tells pandas this is now a table of its own.
+
+```{pyodide}
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+
+print(len(clean), "rows")
+```
+
+From here on, every cleaning step follows the same pattern. Store how many rows you had **before** the step, do the step, then print how many rows it removed. That gives you the record you'll need in your workbook.
+
+```{pyodide}
+before = len(clean)
+# a cleaning step goes here
+print(before - len(clean), "rows removed")
+```
+
+## 5. Quality codes
+
+Here are the quality codes for our rows.
+
+```{pyodide}
+clean["Quality Code"].value_counts()
+```
+
+Code 10 means WQI's checks were done and the result is good. Code 125 is historic data with no confirmed quality checks. Which codes to keep is your decision. Here we'll keep only code 10.
+
+The `.isin()` method checks whether each value is in a list. To keep codes 10 and 20, you'd write `[10, 20]`.
+
+```{pyodide}
+keep_codes = [10]
+
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "rows removed")
+```
+
+## 6. Blank values and "<" values
+
+Some rows have no result at all. The `.isna()` method finds blanks, and `.sum()` counts them.
+
+```{pyodide}
+print(clean["Value"].isna().sum(), "blank values")
+clean[clean["Value"].isna()]
+```
+
+A row with no value can't be used, so we'll remove it. The `.dropna()` method drops rows with a blank in the column you name.
+
+```{pyodide}
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "rows removed")
+```
+
+Rows marked `<` are different. They do have a value, but it's the lowest level the laboratory can measure, not the real concentration. The real value is somewhere below it.
+
+```{pyodide}
+is_lt = clean["Operator"] == "<"
+print(is_lt.sum(), "rows below the detection limit")
+```
+
+There are none for total nitrogen here, but there are for other pollutants. You have two reasonable choices. You can **keep** them, using the limit as the value, which makes those results a little too high. Or you can **drop** them, which loses your lowest results and pushes your averages up. Either is fine if you explain it. To drop them, you'd run this line.
+
+```{pyodide}
+clean = clean[clean["Operator"] != "<"]
+print(len(clean), "rows")
+```
+
+## 7. Units
+
+Earlier we saw two results in micrograms per litre. Let's see if one of them is ours.
+
+```{pyodide}
+clean[clean["Unit"] == "Micrograms/Litre"]
+```
+
+There are 1,000 micrograms in a milligram, so 1,450 micrograms per litre is 1.45 milligrams per litre. Left as it is, this one value is about 1,000 times too big, and it would drag the average for its season way up.
+
+::: {.callout-warning}
+One value in the wrong unit can change the answer to your whole analysis. Always check the `Unit` column.
+:::
+
+We can fix it rather than throw it away. The `.loc[rows, column]` notation picks out particular rows of a particular column, so you can change just those values.
+
+```{pyodide}
+is_ug = clean["Unit"] == "Micrograms/Litre"
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+print(clean["Unit"].value_counts())
+print("Biggest value", clean["Value"].max())
+```
+
+## 8. Duplicates
+
+An exact duplicate is a row that's identical to another row in every column. The `.duplicated()` method marks the second copy of each one. Adding `keep=False` shows both copies so you can compare them.
+
+```{pyodide}
+print(clean.duplicated().sum(), "duplicate rows")
+clean[clean.duplicated(keep=False)]
+```
+
+The `.drop_duplicates()` method removes the extra copies.
+
+```{pyodide}
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "rows removed")
+```
+
+Note that rows with the same `Sample Reference` aren't duplicates. One water sample is tested for several pollutants, so its reference appears once for each.
+
+## 9. Dates
+
+The `Date Time` column is text, and the dates are written **month first**, the American way. So `7/6/18` is 6 July 2018, not 7 June. You can check this by finding a date like `10/24/17`, where the second number is bigger than 12, so it can't be a month.
+
+The `pd.to_datetime()` function turns text into real dates. The `format` argument says how the text is laid out. Here `%m` is the month, `%d` the day, `%y` a two-digit year, `%H` the hour and `%M` the minutes. Adding `errors="coerce"` means any date that doesn't fit becomes a blank (`NaT`) instead of stopping your code.
+
+```{pyodide}
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+
+clean[dates.isna()]
+```
+
+These are the rows that didn't fit. Look at them closely. They're written a different way, but they're still dates. Using `format="mixed"` tells pandas to work out each one on its own. Then `.fillna()` fills the blanks with those fixed dates.
+
+```{pyodide}
+odd = clean.loc[dates.isna(), "Date Time"]
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+clean.loc[dates.isna(), ["Date Time", "Date"]]
+```
+
+Always check the fixed dates look right, for example against the `Sampling Year` column.
+
+Last, check the earliest and latest dates. A date outside the monitoring period is a mistake.
+
+```{pyodide}
+print("Earliest", clean["Date"].min())
+print("Latest", clean["Date"].max())
+first_year = clean["Sampling Year"].min()
+print("First sampling year", first_year)
+```
+
+These all look sensible for total nitrogen. If you ever find a date before the earliest sampling year, which starts on 1 July, you'd remove it like this.
+
+```{pyodide}
+first_date = "2007-07-01"
+
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "rows removed")
+```
+
+## 10. Month and season
+
+The `.dt.month` attribute gets the month number (1 to 12) from each date.
+
+```{pyodide}
+clean["Month"] = clean["Date"].dt.month
+clean["Month"].value_counts()
+```
+
+The wet season is October to March. We'll start by calling every row `"Dry"`, then change the wet months to `"Wet"`.
+
+```{pyodide}
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Month"].isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+
+clean["Season"].value_counts()
+```
+
+Finally, split the data into two tables, one for each season. These are what you'll compare in P3.
+
+```{pyodide}
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet season samples")
+print(len(dry), "dry season samples")
+```
+
+There are far more wet season samples. That's because WQI sample very often during floods and only monthly when the river is low. Keep that in mind when you compare the seasons.
+
+## In-class activities
+
+Each exercise starts fresh, with the data loaded for you. Have a real go before you look at the hints.
+
+### Activity 1. Spot the problems
+
+You'll need section 2.
+
+Look at the **particulate nitrogen** rows and find the problems. Fill in the gaps, run the cell, then answer the questions below it.
+
+```{pyodide}
+#| exercise: ex_spot
+#| setup: true
+import pandas as pd
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+```
+
+```{pyodide}
+#| exercise: ex_spot
+name = "Particulate nitrogen as N"
+pn = conc[conc["Analyte"] == name]
+
+print(pn["Site Code"].______())
+print(pn["Operator"].value_counts(______=False))
+print(pn["Quality Code"].______())
+```
+
+::: {.hint exercise="ex_spot"}
+All three lines use the same method, the one that counts how many rows have each value. The middle one also needs the argument that counts blanks.
+:::
+
+::: {.hint exercise="ex_spot"}
+Use `.value_counts()` on the first and last lines, and `dropna=False` in the middle.
+:::
+
+::: {.solution exercise="ex_spot"}
+```python
+name = "Particulate nitrogen as N"
+pn = conc[conc["Analyte"] == name]
+
+print(pn["Site Code"].value_counts())
+print(pn["Operator"].value_counts(dropna=False))
+print(pn["Quality Code"].value_counts())
+```
+:::
+
+What's wrong with the site code, and how many rows does it affect? How many results are below the detection limit? How many rows aren't quality code 10? For each one, what would you do?
+
+### Activity 2. Fix the units
+
+You'll need section 7.
+
+The **filterable reactive phosphorus** rows for our site are loaded as `frp`. Find any results in micrograms per litre and convert them to milligrams per litre.
+
+```{pyodide}
+#| exercise: ex_units
+#| setup: true
+import pandas as pd
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+name = "Filterable Reactive phosphorus as P"
+frp = conc[conc["Analyte"] == name].copy()
+```
+
+```{pyodide}
+#| exercise: ex_units
+is_ug = frp["Unit"] == ______
+print(is_ug.sum(), "rows to fix")
+
+ug_values = frp.loc[is_ug, "Value"]
+frp.loc[is_ug, "Value"] = ug_values ______ 1000
+frp.loc[is_ug, "Unit"] = ______
+
+print(frp["Unit"].value_counts())
+print("Biggest value", frp["Value"].max())
+```
+
+::: {.hint exercise="ex_units"}
+The unit names are text, so they need quotes. Check the exact spelling with `.value_counts()` in section 2. A microgram is a thousandth of a milligram.
+:::
+
+::: {.hint exercise="ex_units"}
+Compare with `"Micrograms/Litre"`, divide with `/`, and set the unit to `"Milligrams/Litre"`.
+:::
+
+::: {.solution exercise="ex_units"}
+```python
+is_ug = frp["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "rows to fix")
+
+ug_values = frp.loc[is_ug, "Value"]
+frp.loc[is_ug, "Value"] = ug_values / 1000
+frp.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+print(frp["Unit"].value_counts())
+print("Biggest value", frp["Value"].max())
+```
+:::
+
+Run `frp["Value"].mean()` before and after the fix. How much did one wrong value change the mean?
+
+### Activity 3. Dates and seasons
+
+You'll need sections 9 and 10.
+
+The **total suspended solids** rows are loaded as `tss`, already cleaned up to the dates. Turn the dates into real dates, find any that didn't fit, remove any outside the monitoring period, then count the samples in each season.
+
+```{pyodide}
+#| exercise: ex_dates
+#| setup: true
+import pandas as pd
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+name = "Total suspended solids"
+tss = conc[conc["Analyte"] == name].copy()
+tss = tss[tss["Quality Code"] == 10]
+tss = tss.dropna(subset=["Value"]).drop_duplicates()
+```
+
+```{pyodide}
+#| exercise: ex_dates
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(tss["Date Time"], format=fmt,
+                       errors=______)
+odd = tss.loc[dates.______(), "Date Time"]
+print(odd)
+
+fixed = pd.to_datetime(odd, format="mixed")
+tss["Date"] = dates.fillna(fixed)
+print("Earliest", tss["Date"].______())
+
+tss = tss[tss["Date"] >= "2007-07-01"]
+
+wet_months = [10, 11, 12, 1, 2, 3]
+is_wet = tss["Date"].dt.month.isin(______)
+print(is_wet.sum(), "wet season samples")
+print(len(tss) - is_wet.sum(), "dry season samples")
+```
+
+::: {.hint exercise="ex_dates"}
+You want bad dates to become blanks, not errors. Then find the blanks, and the earliest date. The last gap is the list of wet months.
+:::
+
+::: {.hint exercise="ex_dates"}
+Use `errors="coerce"`, then `.isna()`, then `.min()`, then `wet_months`.
+:::
+
+::: {.solution exercise="ex_dates"}
+```python
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(tss["Date Time"], format=fmt,
+                       errors="coerce")
+odd = tss.loc[dates.isna(), "Date Time"]
+print(odd)
+
+fixed = pd.to_datetime(odd, format="mixed")
+tss["Date"] = dates.fillna(fixed)
+print("Earliest", tss["Date"].min())
+
+tss = tss[tss["Date"] >= "2007-07-01"]
+
+wet_months = [10, 11, 12, 1, 2, 3]
+is_wet = tss["Date"].dt.month.isin(wet_months)
+print(is_wet.sum(), "wet season samples")
+print(len(tss) - is_wet.sum(), "dry season samples")
+```
+:::
+
+What was the earliest date before you removed it? Why can't it be right?
+
+## Your workbook code, copy from here
+
+This is the code for Section 2 of your assessment workbook. It does every step on this page in order and prints how many rows each one removed. Run it here first, then copy it into your workbook.
+
+It uses `my_site` and `my_analyte` from your Section 1 code, so run Section 1 first. The lines marked **your decision** are the ones to think about and change if you choose to.
+
+```{pyodide}
+#| exercise: workbook_code
+#| setup: true
+import pandas as pd
+conc = pd.read_csv("data/yarrahappini_concentration.csv")
+my_site = "145014A"
+my_analyte = "Total nitrogen as N"
+```
+
+```{pyodide}
+#| exercise: workbook_code
+#| caption: Your workbook code
+# Tidy stray spaces
+clean = conc.copy()
+for col in ["Site Code", "Analyte", "Unit", "Operator"]:
+    clean[col] = clean[col].str.strip()
+
+# Your site and pollutant
+is_site = clean["Site Code"] == my_site
+is_analyte = clean["Analyte"] == my_analyte
+clean = clean[is_site & is_analyte].copy()
+print(len(clean), "rows to start")
+
+# Quality codes (your decision)
+keep_codes = [10]
+before = len(clean)
+clean = clean[clean["Quality Code"].isin(keep_codes)]
+print(before - len(clean), "removed by quality code")
+
+# Blank values
+before = len(clean)
+clean = clean.dropna(subset=["Value"])
+print(before - len(clean), "removed as blank")
+
+# "<" values (your decision). To drop them,
+# remove the # from the start of the next line.
+# clean = clean[clean["Operator"] != "<"]
+lt = (clean["Operator"] == "<").sum()
+print(lt, "rows below the detection limit kept")
+
+# Units
+is_ug = clean["Unit"] == "Micrograms/Litre"
+print(is_ug.sum(), "values converted from micrograms")
+ug_values = clean.loc[is_ug, "Value"]
+clean.loc[is_ug, "Value"] = ug_values / 1000
+clean.loc[is_ug, "Unit"] = "Milligrams/Litre"
+
+# Duplicates
+before = len(clean)
+clean = clean.drop_duplicates()
+print(before - len(clean), "removed as duplicates")
+
+# Dates, month first, then fix the odd ones
+fmt = "%m/%d/%y %H:%M"
+dates = pd.to_datetime(clean["Date Time"], format=fmt,
+                       errors="coerce")
+odd = clean.loc[dates.isna(), "Date Time"]
+print("Dates that didn't fit")
+print(odd)
+fixed = pd.to_datetime(odd, format="mixed")
+clean["Date"] = dates.fillna(fixed)
+
+# Dates outside the monitoring period (your decision)
+first_date = "2007-07-01"
+before = len(clean)
+clean = clean[clean["Date"] >= first_date]
+print(before - len(clean), "removed as out of range")
+
+# Seasons
+wet_months = [10, 11, 12, 1, 2, 3]
+clean["Season"] = "Dry"
+is_wet = clean["Date"].dt.month.isin(wet_months)
+clean.loc[is_wet, "Season"] = "Wet"
+wet = clean[clean["Season"] == "Wet"]
+dry = clean[clean["Season"] == "Dry"]
+print(len(wet), "wet and", len(dry), "dry samples")
+```
+
+The first step uses a short `for` loop to tidy four columns in one go. It does exactly what the four separate lines did in section 3. In your workbook you don't need the `pd.read_csv()` line, because `conc` is already loaded.
+
+## Bridge to your assessment
+
+1. Open **your saved copy** of the workbook from the Colab Notebooks folder in your Google Drive, not from Canvas.
+2. Run everything so far with **Runtime > Run all**, so `conc`, `my_site` and `my_analyte` exist.
+3. Paste your workbook code into the code cell in Section 2 and run it.
+4. Look at what it prints, especially the dates that didn't fit and any values that were converted. Change the lines marked **your decision** if you choose to, and run it again.
+5. Answer the Section 2 questions in your workbook. Say which quality codes you kept and why, what you did with "<" and blank values, how you handled the dates, how many rows each step removed, and how many samples are in each season.
+
+::: {.checkoff}
+### Check-off 2
+
+When you're ready, put your hand up and show your demonstrator your workbook with these done.
+
+- Your Section 2 cleaning code runs for your site and pollutant.
+- You can say why you kept the quality codes you did, and what you did with "<" and blank values.
+- You've recorded how many rows each step removed.
+- You know how many wet and dry season samples you have.
+
+You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
+:::

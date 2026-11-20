@@ -11,7 +11,7 @@ Your **assessment workbook** is separate. It's a Colab notebook you open from Ca
 | Week | Practical |
 |---|---|
 | 8 | [P1 Python basics](p1.qmd) |
-| 9 | P2 Cleaning data |
+| 9 | [P2 Cleaning data](p2.qmd) |
 | 10 | P3 Describe and test |
 | 11 | P4 Visualise |
 
