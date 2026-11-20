@@ -1,41 +1,43 @@
 # SEB108 Foundations of Data Analysis and Visualisation
 
-Notebooks for SEB108 at QUT (School of Chemistry and Physics). You'll use them in Google Colab to learn Python for data analysis, then analyse real water quality data for our industry partner, the Queensland Government Water Quality and Investigations (WQI) team.
+Teaching materials for SEB108 at QUT (School of Chemistry and Physics). Students learn Python for data analysis, then analyse real river water quality data for our industry partner, the Queensland Government's Water Quality & Investigations team (WQI).
 
-## Before you start: save your own copy
+## For students
 
-Every notebook opens in Colab from a badge on Canvas. When it opens, it's a read-only copy straight from this repo. **Any changes you make won't be saved unless you make your own copy first.**
+There are two places you'll work, and they're kept separate on purpose.
 
-1. Open the notebook from its badge on Canvas.
-2. Go to **File > Save a copy in Drive**.
-3. Work in the copy that opens (its name starts with "Copy of"). It lives in your Google Drive, in a folder called Colab Notebooks.
+| What | Where | Do you hand it in? |
+|---|---|---|
+| Practicals P1 to P4 | The [SEB108 practicals site](https://mjcowley.github.io/SEB108/). Python runs in your browser, so there's nothing to install or save. | No |
+| Assessment 1 workbook | A Google Colab notebook. Open it from the **Open in Colab** button on Canvas. | Yes |
 
-If you close the tab without doing this, your work is gone.
+When the workbook opens in Colab, go straight to **File > Save a copy in Drive** and work in your copy. If you skip this, your changes won't be saved.
 
-## What's in here
+Everything else, including due dates and how check-offs work, is on Canvas.
 
-| Folder | What it's for |
+## What's in this repository
+
+| Folder | Contents |
 |---|---|
-| `practicals/` | Four practical workbooks, one for each practical in Weeks 8 to 11 |
-| `assessment/` | The assessment workbook for A1 |
-| `data/` | The water quality data the notebooks load |
-
-The practicals and the assessment use data from different river basins. The code you write in the practicals will carry over to the assessment, but the answers won't.
-
-### Practicals or assessment?
-
-They look different on purpose. The assessment workbook has a banner at the top that says it's the assessment. If you don't see that banner, you've got a practical workbook open. Check before you submit.
-
-## How to open a notebook
-
-Use the Colab badges on Canvas. You don't need to download anything or install Python: the notebooks load their data straight from this repo.
-
-If the data won't load (for example, GitHub is down), there's a copy of each data file on Canvas. The notebook explains how to upload it instead.
+| `practicals/` | The practicals website, written in [Quarto](https://quarto.org) with [quarto-live](https://r-wasm.github.io/quarto-live/) |
+| `practicals/data/` | Practical data, Logan River at Yarrahappini |
+| `assessment/` | The Assessment 1 workbook (Colab notebook) |
+| `data/assessment/` | Assessment data, five Brisbane catchment sites, plus annual loads |
 
 ## Data
 
-The water quality data comes from the Queensland Government's water monitoring program, run by the WQI team. Details of the source and attribution will be added here.
+The water quality data comes from WQI's monitoring program, published on the [Tahbil Water Quality Data Portal](https://apps.des.qld.gov.au/water-data-portal/about). It's used and redistributed here with WQI's permission.
 
-## Questions
+Attribution wording to come.
 
-Ask in your practical session, or post on the unit's Canvas discussion board.
+## Building the practicals site
+
+The site is rebuilt and published to GitHub Pages automatically whenever changes are pushed to `main` (see `.github/workflows/publish-practicals.yml`).
+
+To preview it on your own computer, install [Quarto](https://quarto.org/docs/get-started/), then run this from the repository folder.
+
+```bash
+quarto preview practicals
+```
+
+The pages need to be served over the web to run their Python, so opening the HTML files directly won't work.
