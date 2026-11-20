@@ -301,7 +301,7 @@ Colab may offer to write code for you. You can use GenAI on your workbook, but n
 
 ## In-class activities
 
-Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look.
+Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look. If you finish early, there's extra practice at the bottom of the page.
 
 Every exercise starts fresh, so the data is loaded for you where it's needed.
 
@@ -340,54 +340,7 @@ print(load_kg_per_day)
 ```
 :::
 
-### Activity 2. Exam scores
-
-You'll need sections 4 and 5.
-
-Here are the mid-semester exam scores (out of 120) for a class. Work out how many students sat the exam, the mean score, and the highest and lowest scores. Round the mean to one decimal place.
-
-```{pyodide}
-#| exercise: ex_scores
-scores = [100, 68, 40, 78, 81, 65, 39, 118,
-          46, 78, 9, 37, 43, 87, 54, 29, 95,
-          87, 111, 65, 43, 53, 47, 16, 98, 82,
-          58, 5, 49, 67, 60, 76, 16, 111, 65,
-          61, 73, 63, 115, 72]
-
-n_students = ______
-mean_score = ______
-print(n_students, "students")
-print("Mean", round(mean_score, 1))
-print("Highest", ______)
-print("Lowest", ______)
-```
-
-::: {.hint exercise="ex_scores"}
-The `len()` function counts the items in a list. The mean is the total divided by the count. Use `max()` and `min()` for the biggest and smallest.
-:::
-
-::: {.hint exercise="ex_scores"}
-`n_students = len(scores)` and `mean_score = sum(scores) / len(scores)`
-:::
-
-::: {.solution exercise="ex_scores"}
-```python
-scores = [100, 68, 40, 78, 81, 65, 39, 118,
-          46, 78, 9, 37, 43, 87, 54, 29, 95,
-          87, 111, 65, 43, 53, 47, 16, 98, 82,
-          58, 5, 49, 67, 60, 76, 16, 111, 65,
-          61, 73, 63, 115, 72]
-
-n_students = len(scores)
-mean_score = sum(scores) / len(scores)
-print(n_students, "students")
-print("Mean", round(mean_score, 1))
-print("Highest", max(scores))
-print("Lowest", min(scores))
-```
-:::
-
-### Activity 3. Load and look
+### Activity 2. Load and look
 
 You'll need section 7.
 
@@ -426,7 +379,7 @@ print(conc.dtypes)
 ```
 :::
 
-### Activity 4. What's in the data?
+### Activity 3. What's in the data?
 
 You'll need section 8.
 
@@ -464,7 +417,7 @@ print(conc["Collection Method"].value_counts())
 
 How many different analytes are there? Which quality codes appear, and roughly what share of the rows aren't code 10? How were most samples collected?
 
-### Activity 5. One analyte
+### Activity 4. One analyte
 
 You'll need section 8.
 
@@ -508,16 +461,6 @@ print("Biggest", tn["Value"].max())
 
 The biggest value is far bigger than the mean. Change your code to show the rows where the value is over 100, with `tn[tn["Value"] > 100]`. Look at the `Unit` column for that row. What do you think has happened? You'll come back to this in P2.
 
-### Activity 6. Your site and pollutant
-
-No code this time. Write your answers on paper or in a notes file, ready to put into your workbook.
-
-1. Find your allocated site and pollutant on the **Assessment Brief and Data** page on Canvas. It depends on the last digit of your student number. Write down the site code and the analyte name exactly as they appear in the data.
-2. Write a hypothesis in this form. The concentration of *[your analyte]* at *[your site]* differs between the wet season and the dry season.
-3. Write the **null hypothesis**, the "nothing's going on" version.
-4. Predict which season you think will be higher, and give a reason. Think about what rain does to a river.
-5. WQI take samples very often during floods and only monthly when the river is low. How might that affect a wet versus dry comparison?
-
 ## Your workbook code, copy from here
 
 This is the code for Section 1 of your assessment workbook. Run it here first to see what it does. Then copy it into your workbook and change the two lines at the top to your own site code and analyte.
@@ -558,7 +501,57 @@ Your assessment data has the same columns as the practical data. Now you'll do t
 1. Open your **assessment workbook** from the **Open in Colab** button on Canvas.
 2. Go to **File > Save a copy in Drive**, and work in your copy from now on.
 3. Run the loader cell, then the sanity-check cell. Check the number of rows and the first few rows look sensible.
-4. Paste your workbook code into Section 1, change `my_site` and `my_analyte` to your allocated site and pollutant, and run it.
-5. Write your hypothesis, null hypothesis and predicted direction in Section 1.
+4. Find your allocated site and pollutant on the **Assessment Brief and Data** page on Canvas. It depends on the last digit of your student number.
+5. Paste your workbook code into Section 1. Change `my_site` and `my_analyte` to your site code and analyte, written exactly as they appear in the data, and run it.
+6. Write your hypothesis, null hypothesis and predicted direction (wet or dry season higher, and why) in Section 1.
 
 That's check-off 1. When you're ready, put your hand up and your demonstrator will come and see it.
+
+## Extra practice (optional)
+
+### Exam scores
+
+For when you've finished everything else. You'll need sections 4 and 5.
+
+Here are the mid-semester exam scores (out of 120) for a class. Work out how many students sat the exam, the mean score, and the highest and lowest scores. Round the mean to one decimal place.
+
+```{pyodide}
+#| exercise: ex_scores
+scores = [100, 68, 40, 78, 81, 65, 39, 118,
+          46, 78, 9, 37, 43, 87, 54, 29, 95,
+          87, 111, 65, 43, 53, 47, 16, 98, 82,
+          58, 5, 49, 67, 60, 76, 16, 111, 65,
+          61, 73, 63, 115, 72]
+
+n_students = ______
+mean_score = ______
+print(n_students, "students")
+print("Mean", round(mean_score, 1))
+print("Highest", ______)
+print("Lowest", ______)
+```
+
+::: {.hint exercise="ex_scores"}
+The `len()` function counts the items in a list. The mean is the total divided by the count. Use `max()` and `min()` for the biggest and smallest.
+:::
+
+::: {.hint exercise="ex_scores"}
+`n_students = len(scores)` and `mean_score = sum(scores) / len(scores)`
+:::
+
+::: {.solution exercise="ex_scores"}
+```python
+scores = [100, 68, 40, 78, 81, 65, 39, 118,
+          46, 78, 9, 37, 43, 87, 54, 29, 95,
+          87, 111, 65, 43, 53, 47, 16, 98, 82,
+          58, 5, 49, 67, 60, 76, 16, 111, 65,
+          61, 73, 63, 115, 72]
+
+n_students = len(scores)
+mean_score = sum(scores) / len(scores)
+print(n_students, "students")
+print("Mean", round(mean_score, 1))
+print("Highest", max(scores))
+print("Lowest", min(scores))
+```
+:::
