@@ -21,8 +21,8 @@
 // Put code output in its own shaded box, so it doesn't blend into the text.
 .cell-output-container-pyodide:not(:empty) {
   background: rgba($body-color, 0.05);
-  border-left: 4px solid $primary;
-  border-radius: 0 6px 6px 0;
+  border: 1px solid rgba($body-color, 0.12);
+  border-radius: 6px;
   margin: -0.5rem 0 1.25rem 0;
   padding: 0.6rem 0.9rem;
   overflow-x: auto;
@@ -51,6 +51,13 @@
 .cell-output-container-pyodide table {
   margin-bottom: 0;
   font-size: 0.85rem;
+}
+
+// Callouts (Note, Warning, Tip) get an even border all round, with no
+// thick coloured bar down the left edge.
+div.callout {
+  border: 1px solid rgba($body-color, 0.15) !important;
+  border-radius: 6px;
 }
 
 // Errors stand out in a warning colour.

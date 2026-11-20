@@ -31,11 +31,13 @@ Cells on this page share what they've made, so a cell can use a variable made in
 
 ## 2. Numbers, maths and variables
 
-Python works like a calculator.
+Python works like a calculator. Here are three turbidity readings from a creek, in NTU. Work out their mean on your calculator first, then run the cell and check that Python agrees.
 
 ```{pyodide}
-2 + 3
+(12.4 + 8.1 + 35.0) / 3
 ```
+
+The brackets matter. Without them, Python divides 35.0 by 3 first and then adds, following the same order of operations as maths. Take the brackets out and run it again to see the difference.
 
 To keep a result, store it in a **variable** with `=`.
 
@@ -154,12 +156,18 @@ print(site.upper())
 print(site.title())
 ```
 
-From Section 7 you'll use methods on tables of data, like `conc.head()`. It's the same idea. You write the value, a dot, then the method name and brackets.
+You'll use methods a lot once you start working with tables of data in Section 7.
 
 If you're not sure what a function does, `help()` will tell you.
 
 ```{pyodide}
 help(round)
+```
+
+Now try it on some of the other functions you've used on this page. Change `max` below to `min`, `len` or `sum` and run it again. The first few lines are the useful part, and you can skip the rest.
+
+```{pyodide}
+help(max)
 ```
 
 ## 6. Errors
@@ -170,9 +178,11 @@ Errors are normal. Everyone gets them, all the time. Run the cell below to see o
 print(rainfall)
 ```
 
-Always **read the last line of an error first**. It tells you the type of error and what went wrong. Here it's a `NameError`, because Python doesn't know anything called `rainfall`. We never made it.
+On this page you only see the message, `name 'rainfall' is not defined`. Python doesn't know anything called `rainfall`, because we never made it.
 
-These are the errors you're most likely to see in this unit.
+In Colab you'll see the full error, which can run to several lines. Always **read the last line first**. It starts with the type of error and then the message, so this one would end with `NameError: name 'rainfall' is not defined`.
+
+These are the error types you're most likely to see in this unit.
 
 | Error | What it usually means |
 |---|---|
