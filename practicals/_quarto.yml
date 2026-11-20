@@ -16,7 +16,8 @@ website:
         href: p2.qmd
       - text: "P3 Describe and test"
         href: p3.qmd
-      # Add P4 here when it's written
+      - text: "P4 Visualise"
+        href: p4.qmd
 
 format:
   live-html:
