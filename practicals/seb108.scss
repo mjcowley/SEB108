@@ -1,0 +1,46 @@
+/*-- scss:defaults --*/
+// Shared by the light and dark themes. Colours come from each theme,
+// so the same rules work in both.
+
+/*-- scss:rules --*/
+
+// Put code output in its own shaded box, so it doesn't blend into the text.
+.cell-output-container-pyodide:not(:empty) {
+  background: rgba($body-color, 0.05);
+  border-left: 4px solid $primary;
+  border-radius: 0 6px 6px 0;
+  margin: -0.5rem 0 1.25rem 0;
+  padding: 0.6rem 0.9rem;
+  overflow-x: auto;
+}
+
+// A small "Output" label so students can tell what came from their code.
+.cell-output-container-pyodide:not(:empty)::before {
+  content: "Output";
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba($body-color, 0.6);
+  margin-bottom: 0.35rem;
+}
+
+.cell-output-container-pyodide pre {
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+// Tables (DataFrames) inside output.
+.cell-output-container-pyodide table {
+  margin-bottom: 0;
+  font-size: 0.85rem;
+}
+
+// Errors stand out in a warning colour.
+.cell-output-container-pyodide .cell-output-stderr,
+.cell-output-container-pyodide .cell-output-error {
+  color: $danger;
+}

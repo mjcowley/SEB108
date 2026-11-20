@@ -20,3 +20,9 @@ format:
   live-html:
     toc: true
     toc-depth: 2
+    # Light and dark themes. Quarto adds a toggle to the sidebar,
+    # and follows the student's system setting on first visit.
+    theme:
+      light: [cosmo, seb108.scss]
+      dark: [darkly, seb108.scss]
+    respect-user-color-scheme: true
