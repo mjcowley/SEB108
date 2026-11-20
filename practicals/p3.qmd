@@ -131,14 +131,16 @@ plt.title("Wet season")
 plt.show()
 ```
 
+Notice how the bars are squashed against the left side, with a long empty stretch to the right. A few huge values stretch the axis out past 9,000 mg/L, so everything else gets crammed into the first few bars. That squashed look is a tell-tale sign of right skew, and you'll probably see it when you plot your own data.
+
 Most samples are fairly low, but a few are enormous. These come from floods, when the river carries huge amounts of sediment. The shape has a long tail to the right, which is called **right-skewed**.
 
 A handful of huge values pull the mean up a long way, but they barely move the median, because the median only cares about the middle. That's why the mean and median disagree, and why the median is often the better summary for data like this.
 
-![](images/p3-mean-median-light.png){.light-content fig-alt="Histogram of wet season TSS at Yarrahappini. Most samples are below 1,000 mg/L, with a long tail of a few samples out to about 9,000 mg/L. A solid line marks the median at 223 mg/L, and a dashed line marks the mean at 476 mg/L, well to the right of the median."}
-![](images/p3-mean-median-dark.png){.dark-content fig-alt="Histogram of wet season TSS at Yarrahappini. Most samples are below 1,000 mg/L, with a long tail of a few samples out to about 9,000 mg/L. A solid line marks the median at 223 mg/L, and a dashed line marks the mean at 476 mg/L, well to the right of the median."}
+![](images/p3-mean-median-light.png){.light-content fig-alt="Histogram of wet season TSS at Yarrahappini. The axis is zoomed in on 0 to 3,000 mg/L. Most samples are below 500 mg/L, and the bars trail off in a long tail to the right. A note says 12 samples above 3,000 mg/L are not shown, the highest being 9,240 mg/L. A solid line marks the median at 223 mg/L, and a dashed line marks the mean at 476 mg/L, well to the right of the median."}
+![](images/p3-mean-median-dark.png){.dark-content fig-alt="Histogram of wet season TSS at Yarrahappini. The axis is zoomed in on 0 to 3,000 mg/L. Most samples are below 500 mg/L, and the bars trail off in a long tail to the right. A note says 12 samples above 3,000 mg/L are not shown, the highest being 9,240 mg/L. A solid line marks the median at 223 mg/L, and a dashed line marks the mean at 476 mg/L, well to the right of the median."}
 
-Here's the same histogram with the median (solid line) and mean (dashed line) marked. The few huge flood samples drag the mean well to the right of the median.
+Here's the same data zoomed in on 0 to 3,000 mg/L, so you can see the shape, with the median (solid line) and mean (dashed line) marked. The 12 samples above 3,000 mg/L aren't shown, but they're still in the mean, and they drag it well to the right of the median.
 
 Try the same histogram for `dry`.
 
@@ -172,8 +174,8 @@ A test only gives a trustworthy answer if its assumptions are met. The t-test as
 
 Here's what the first assumption looks like, next to our data.
 
-![](images/p3-normal-skewed-light.png){.light-content fig-alt="Two histograms side by side. The left one, made-up data, is a symmetrical bell shape centred on 50. The right one, real wet season TSS, has a tall peak near zero and a long tail stretching to the right."}
-![](images/p3-normal-skewed-dark.png){.dark-content fig-alt="Two histograms side by side. The left one, made-up data, is a symmetrical bell shape centred on 50. The right one, real wet season TSS, has a tall peak near zero and a long tail stretching to the right."}
+![](images/p3-normal-skewed-light.png){.light-content fig-alt="Two histograms side by side. The left one, made-up data, is a symmetrical bell shape centred on 50. The right one, real wet season TSS, zoomed in on 0 to 3,000 mg/L, has a tall peak near zero and a long tail stretching to the right."}
+![](images/p3-normal-skewed-dark.png){.dark-content fig-alt="Two histograms side by side. The left one, made-up data, is a symmetrical bell shape centred on 50. The right one, real wet season TSS, zoomed in on 0 to 3,000 mg/L, has a tall peak near zero and a long tail stretching to the right."}
 
 A normal distribution is symmetrical, with most values near the middle. Ours is nothing like it.
 
