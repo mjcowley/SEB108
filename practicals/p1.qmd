@@ -277,7 +277,7 @@ Quality code 10 means WQI rates the result as good. You'll decide which quality 
 
 ## In-class activities
 
-Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look. If you finish early, there's extra practice at the bottom of the page.
+Work through these in order. Each one says which sections it needs, so go back and check if you're stuck. Each exercise has hints and a solution, but have a real go before you look.
 
 Every exercise starts fresh, so the data is loaded for you where it's needed.
 
@@ -516,53 +516,4 @@ When you're ready, put your hand up and show your demonstrator your workbook wit
 - Your hypothesis, null hypothesis and predicted direction are written in Section 1.
 
 You'll run your code in front of them without GenAI, and they'll ask you a question or two about it. If you don't get there today, you can catch up at a later practical or the Week 12 drop-in.
-:::
-
-## Extra practice (optional)
-
-### Exam scores
-
-For when you've finished everything else. You'll need sections 4 and 5.
-
-Here are the mid-semester exam scores (out of 120) for a class. Work out how many students sat the exam, the mean score, and the highest and lowest scores. Round the mean to one decimal place.
-
-```{pyodide}
-#| exercise: ex_scores
-scores = [100, 68, 40, 78, 81, 65, 39, 118,
-          46, 78, 9, 37, 43, 87, 54, 29, 95,
-          87, 111, 65, 43, 53, 47, 16, 98, 82,
-          58, 5, 49, 67, 60, 76, 16, 111, 65,
-          61, 73, 63, 115, 72]
-
-n_students = ______
-mean_score = ______
-print(n_students, "students")
-print("Mean", round(mean_score, 1))
-print("Highest", ______)
-print("Lowest", ______)
-```
-
-::: {.hint exercise="ex_scores"}
-The `len()` function counts the items in a list. The mean is the total divided by the count. Use `max()` and `min()` for the biggest and smallest.
-:::
-
-::: {.hint exercise="ex_scores"}
-`n_students = len(scores)` and `mean_score = sum(scores) / len(scores)`
-:::
-
-::: {.solution exercise="ex_scores"}
-```python
-scores = [100, 68, 40, 78, 81, 65, 39, 118,
-          46, 78, 9, 37, 43, 87, 54, 29, 95,
-          87, 111, 65, 43, 53, 47, 16, 98, 82,
-          58, 5, 49, 67, 60, 76, 16, 111, 65,
-          61, 73, 63, 115, 72]
-
-n_students = len(scores)
-mean_score = sum(scores) / len(scores)
-print(n_students, "students")
-print("Mean", round(mean_score, 1))
-print("Highest", max(scores))
-print("Lowest", min(scores))
-```
 :::
