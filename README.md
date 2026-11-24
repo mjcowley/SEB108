@@ -19,7 +19,7 @@ The practicals and the assessment use data from different rivers. Each practical
 
 ## Data credits
 
-Water quality data © State of Queensland (Department of the Environment, Tourism, Science and Innovation), from the Tahbil Water Quality Data Portal run by Water Quality & Investigations, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The files in this repository are a modified subset of that data, selected and changed for teaching. They're used with the support of Water Quality & Investigations.
+Water quality data © State of Queensland (Department of the Environment, Tourism, Science and Innovation), from the [Tahbil Water Quality Data Portal](https://apps.des.qld.gov.au/water-data-portal/) run by Water Quality & Investigations, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The files in this repository are a modified subset of that data, selected and changed for teaching. They're used with the support of Water Quality & Investigations.
 
 The methods behind the data are described in Water Quality & Investigations (2024), *Tahbil Water Quality Data Portal. Analyses, Quality and Methods for Calculating Pollutant Loads/Yields and the Pesticides Risk Metric*, Department of Environment, Science and Innovation, Brisbane, Australia.
 
