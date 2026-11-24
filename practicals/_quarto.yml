@@ -18,6 +18,10 @@ website:
         href: p3.qmd
       - text: "P4 Visualise"
         href: p4.qmd
+  page-footer:
+    center: |
+      © 2026 Queensland University of Technology. Teaching materials [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), code MIT.
+      Water quality data © State of Queensland, modified for teaching, CC BY 4.0.
 
 format:
   live-html:
